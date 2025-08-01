@@ -1,10 +1,10 @@
 ---
-title: Code Review Checklist Rule
-category: style
-labels: code-review, quality-assurance, manual, checklist, best-practices, intermediate
+labels: code-review, quality-assurance, manual, checklist, best-practices, team-collaboration, documentation, intermediate
 author: Cascade Community
-created: 2024-07-31
+modified: 2024-07-31
 ---
+
+# Code Review Checklist Rule
 
 ## Description
 
@@ -61,7 +61,3 @@ database query to prevent SQL injection."
 5. **Security**: Look for potential security issues
 6. **Performance**: Consider the performance impact
 7. **Feedback**: Provide constructive, specific feedback
-
-## Tags
-
-code-review, quality-assurance, checklist, best-practices, team-collaboration, documentation

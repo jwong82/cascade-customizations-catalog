@@ -1,6 +1,6 @@
 ---
 trigger: glob
-globs: *.js
+globs: *.js, src/*.js
 ---
 
 content for how to write Javascript files

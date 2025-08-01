@@ -1,6 +1,6 @@
-# Contributing to Cascade Community Customizations
+# Contributing to Cascade Customizations Catalog
 
-Thank you for your interest in contributing to the Cascade Community Customizations repository! This guide will help you understand how to contribute effectively.
+Thank you for your interest in contributing to the Cascade Customizations Catalog repository! This guide will help you understand how to contribute effectively.
 
 ## How to Contribute
 

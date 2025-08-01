@@ -1,10 +1,10 @@
 ---
-title: TypeScript Best Practices Rule
-category: language
-labels: typescript, javascript, type-safety, glob-based, intermediate
+labels: typescript, javascript, type-safety, best-practices, code-quality, static-typing, glob-based, intermediate
 author: Cascade Community
-created: 2024-07-31
+modified: 2024-07-31
 ---
+
+# TypeScript Best Practices Rule
 
 ## Description
 
@@ -59,7 +59,3 @@ async function fetchUser(id: string): Promise<Result<User>> {
   }
 }
 ```
-
-## Tags
-
-typescript, type-safety, best-practices, code-quality, static-typing

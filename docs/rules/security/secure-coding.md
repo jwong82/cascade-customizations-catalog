@@ -1,10 +1,10 @@
 ---
-title: Secure Coding Practices Rule
-category: security
-labels: security, best-practices, always-on, authentication, encryption, advanced
+labels: security, best-practices, always-on, authentication, authorization, encryption, input-validation, vulnerability-prevention, advanced
 author: Cascade Community
-created: 2024-07-31
+modified: 2024-07-31
 ---
+
+# Secure Coding Practices Rule
 
 ## Description
 
@@ -102,7 +102,3 @@ app.use((error, req, res, next) => {
   });
 });
 ```
-
-## Tags
-
-security, authentication, authorization, input-validation, encryption, vulnerability-prevention

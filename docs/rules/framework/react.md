@@ -1,10 +1,10 @@
 ---
-title: React Best Practices Rule
-category: framework
-labels: react, javascript, typescript, frontend, hooks, model-decision, intermediate
+labels: react, javascript, typescript, frontend, hooks, functional-components, performance, jsx, model-decision, intermediate
 author: Cascade Community
-created: 2024-07-31
+modified: 2024-07-31
 ---
+
+# React Best Practices Rule
 
 ## Description
 
@@ -75,7 +75,3 @@ const ExpensiveComponent = React.memo<Props>(({ data, onUpdate }) => {
   return prevProps.data.id === nextProps.data.id;
 });
 ```
-
-## Tags
-
-react, hooks, functional-components, performance, jsx, frontend

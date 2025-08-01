@@ -1,10 +1,10 @@
 ---
-title: Node.js Project Setup Workflow
-category: setup
-labels: nodejs, typescript, javascript, setup, testing, eslint, prettier, beginner
+labels: nodejs, typescript, javascript, setup, project-setup, development-environment, testing, code-quality, eslint, prettier, beginner
 author: Cascade Community
-created: 2024-07-31
+modified: 2024-07-31
 ---
+
+# Node.js Project Setup Workflow
 
 ## Description
 
@@ -139,7 +139,3 @@ PORT=3000
 DATABASE_URL=postgresql://localhost:5432/myapp
 JWT_SECRET=super_secret_key_123
 ```
-
-## Tags
-
-nodejs, typescript, project-setup, development-environment, testing, code-quality, eslint, prettier

@@ -1,45 +1,56 @@
-# Cascade Community Customizations
+# Cascade Customizations Catalog
 
-A community-driven repository of rules and workflows for Windsurf's Cascade AI assistant, designed to enhance and customize the AI's behavior for different use cases, frameworks, and development practices.
+A community-driven repository of sample rules and workflows for Windsurf Cascade. Cascade Customizations (Rules and Workflows) guide the AI's behavior to make the tool more effective for varying use cases, frameworks, and development practices.
 
 ## Purpose
 
-This repository serves as a centralized hub for the Windsurf community to share, discover, and contribute customizations that make Cascade more effective for specific development scenarios. Whether you're working with particular programming languages, frameworks, or following specific coding standards, you can find and contribute customizations that tailor Cascade's behavior to your needs.
+This repository serves as a centralized hub for the Windsurf community to share, discover, and contribute reference customizations that enhance Cascade. 
+
+This catalog is intended to serve as:
+1. A central location for the Windsurf community to aggregate sample rules and workflows
+2. A reference repository structure that Enterprises can use to catalog and distribute proprietary and internal Cascade Customizations
 
 ## What are Customizations?
 
-Customizations in Cascade come in two forms:
+Customizations in Cascade drive Cascade's behavior and fall under the categories of Rules or Workflows:
 
 ### Rules
-Rules influence how Cascade behaves in specific contexts. There are four types of rule activation modes:
+Rules influence how Cascade responds to user prompts. Because not all rules should apply to every user prompt, there are four types of rule activation modes:
 
-- **Always On**: Rules that apply to every interaction
-- **Model Decision**: Rules that Cascade automatically applies when it detects certain conditions
-- **Glob-based**: Rules that activate based on file patterns (e.g., `*.js`, `dir/*, dir/**/*`)
-- **Manual**: Rules that users can reference when desired
+- **Always On**: Rules that apply to every user message
+- **Model Decision**: Rules that Cascade chooses to apply based on the rule's description
+- **Glob-based**: Rules that Cascade applies based on file patterns (such as `*.js`, `dir/*, dir/**/*.js`)
+- **Manual**: Rules that users tell Cascade to apply as desired
+
+These rules apply guidelines for the AI to follow during response generation.
 
 ### Workflows
-Workflows are step-by-step procedures that guide Cascade through complex tasks like project setup, testing procedures, deployment processes, and more.
+Workflows are explicitly defined step-by-step procedures that help Cascade work through sequential tasks. Workflows are available via the /\<workflow-name> shortcut in the Text Box.
+
+Workflows can be used for one time tasks like project setup or repeated tasks like testing procedures, deployment processes, debugging methodology, and more.
 
 ## Repository Structure
 
 ```
 windsurf/
 ├── rules/
-│   ├── language/          # Language-specific rules
+├── ├── <top-level-aggregation>/<sub-aggregation>/<rule-name>.md
 │   ├── framework/         # Framework-specific rules
-│   ├── testing/          # Testing-related rules
+│   ├── general/         # General rules
+│   ├── language/          # Language-specific rules
 │   ├── security/         # Security-focused rules
-│   └── style/            # Code style and formatting rules
+│   ├── style/            # Code style and formatting rules
+│   └── testing/          # Testing-related rules
 └── workflows/
+├── ├── <top-level-aggregation>/<sub-aggregation>/<workflow-name>.md
     ├── setup/            # Project setup workflows
     ├── testing/          # Testing workflows
     ├── deployment/       # Deployment workflows
     └── maintenance/      # Maintenance workflows
 
 docs/
-├── rules/                # Documentation for rules
-├── workflows/            # Documentation for workflows
+├── rules/                # Documentation for all rules
+├── workflows/            # Documentation for all workflows
 └── labels.md            # Standardized labels for categorization
 ```
 
@@ -58,10 +69,12 @@ We welcome contributions from the community! Please see [CONTRIBUTING.md](CONTRI
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Community
+## Resources
 
-- [Windsurf Documentation](https://docs.windsurf.com)
 - [Windsurf Website](https://windsurf.com)
+- [Windsurf Documentation](https://docs.windsurf.com)
+- [Windsurf Rules](https://docs.windsurf.com/windsurf/cascade/memories#rules)
+- [Windsurf Workflows](https://docs.windsurf.com/windsurf/cascade/workflows)
 
 ---
 

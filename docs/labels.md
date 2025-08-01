@@ -1,7 +1,5 @@
 # Standardized Labels for Cascade Customizations
 
-This document defines the standardized labels used to categorize and tag customizations in the Cascade Community Customizations repository.
-
 ## Primary Categories
 
 ### Languages
