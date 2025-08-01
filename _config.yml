@@ -1,0 +1,46 @@
+# GitHub Pages configuration for Cascade Customizations Catalog
+title: Cascade Customizations Catalog
+description: Community-driven rules and workflows for Windsurf Cascade
+url: "https://windsurf-ai.github.io"
+baseurl: "/cascade-customizations"
+
+# Web UI directory
+web_ui_dir: web-ui
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# Exclude files from processing
+exclude:
+  - README.md
+  - CONTRIBUTING.md
+  - LICENSE
+  - node_modules/
+  - .git/
+  - .gitignore
+
+# Include files that start with underscore
+include:
+  - _config.yml
+
+# Plugin settings
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+# Collections for better organization
+collections:
+  rules:
+    output: false
+  workflows:
+    output: false
+
+# Default settings
+defaults:
+  - scope:
+      path: "docs"
+    values:
+      layout: null
+      sitemap: false
