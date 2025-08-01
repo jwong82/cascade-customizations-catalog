@@ -30,9 +30,18 @@ class CascadeCatalog {
 
     async loadCustomizations() {
         // Detect if we're running on GitHub Pages or locally
-        // Temporarily force GitHub Pages mode for testing
-        const isGitHubPages = window.location.hostname.includes('github.io') || window.location.search.includes('test-gh-pages');
-        const basePath = isGitHubPages ? '/cascade-customizations' : '..';
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        
+        // Dynamically determine the base path for any repository
+        let basePath;
+        if (isGitHubPages) {
+            // Extract repository name from URL: https://user.github.io/repo-name/
+            const pathParts = window.location.pathname.split('/').filter(part => part);
+            const repoName = pathParts[0] || 'cascade-customizations-catalog';
+            basePath = `/${repoName}`;
+        } else {
+            basePath = '..';
+        }
         
         const customizationPaths = [
             // Rules

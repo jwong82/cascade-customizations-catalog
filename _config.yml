@@ -2,7 +2,7 @@
 title: Cascade Customizations Catalog
 description: Community-driven rules and workflows for Windsurf Cascade
 url: "https://windsurf-ai.github.io"
-baseurl: "/cascade-customizations"
+baseurl: "/cascade-customizations-catalog"
 
 # Web UI directory
 web_ui_dir: web-ui
