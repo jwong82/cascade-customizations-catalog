@@ -35,6 +35,49 @@ This document defines the standardized labels used to categorize and tag customi
 - `laravel`
 - `rails`
 
+### Technologies & Tools
+- `docker`
+- `kubernetes`
+- `git`
+- `github`
+- `gitlab`
+- `jenkins`
+- `circleci`
+- `github-actions`
+- `aws`
+- `azure`
+- `gcp`
+- `terraform`
+- `ansible`
+- `nginx`
+- `apache`
+- `redis`
+- `mongodb`
+- `postgresql`
+- `mysql`
+- `elasticsearch`
+- `rabbitmq`
+- `kafka`
+- `graphql`
+- `rest`
+- `grpc`
+- `webpack`
+- `vite`
+- `babel`
+- `eslint`
+- `prettier`
+- `jest`
+- `cypress`
+- `playwright`
+- `storybook`
+- `figma`
+- `postman`
+- `swagger`
+- `prometheus`
+- `grafana`
+- `sentry`
+- `datadog`
+
 ### Development Areas
 - `frontend`
 - `backend`
