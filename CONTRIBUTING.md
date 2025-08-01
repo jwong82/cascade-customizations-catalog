@@ -22,23 +22,24 @@ For each customization you contribute, you must provide:
 ### 3. File Structure
 
 #### Rules
-- Place rule files in: `.windsurf/rules/<category>/<rule-name>.md`
+- Place rule files in: `windsurf/rules/<category>/<rule-name>.md`
 - Place documentation in: `docs/rules/<category>/<rule-name>.md`
 
 #### Workflows  
-- Place workflow files in: `.windsurf/workflows/<category>/<workflow-name>.md`
+- Place workflow files in: `windsurf/workflows/<category>/<workflow-name>.md`
 - Place documentation in: `docs/workflows/<category>/<workflow-name>.md`
 
 ### 4. Categories
 
-Use these top-level categories for organization:
+You may use these suggested top-level categories for organization:
 
 **Rules:**
 - `language/` - Language-specific rules (typescript.md, python.md, etc.)
 - `framework/` - Framework-specific rules (react.md, vue.md, etc.)
-- `testing/` - Testing-related rules
+- `general/` - General-purpose rules
 - `security/` - Security-focused rules
 - `style/` - Code style and formatting rules
+- `testing/` - Testing-related rules
 
 **Workflows:**
 - `setup/` - Project setup workflows
@@ -48,16 +49,26 @@ Use these top-level categories for organization:
 
 ### 5. Documentation Requirements
 
-Each documentation file must include:
+Each documentation file must include the required YAML frontmatter followed by structured content:
 
-```markdown
+```yaml
 ---
-title: [Descriptive title]
-category: [Category name]
 labels: [comma, separated, labels]
 author: [Your name/username]
-created: [YYYY-MM-DD]
+modified: [YYYY-MM-DD]
 ---
+```
+
+Followed by:
+- **H1 Title**: The name of the customization
+- **Description**: What the customization does
+- **Usage**: How and when to use it
+- **Examples**: Practical code examples
+
+#### Required Sections
+
+```markdown
+# [Customization Name]
 
 ## Description
 
@@ -70,11 +81,19 @@ created: [YYYY-MM-DD]
 ## Examples
 
 [Practical examples of the customization in action]
-
-## Tags
-
-[Additional searchable tags]
 ```
+
+#### Labels
+
+Use standardized labels from [`docs/labels.md`](docs/labels.md) for consistent categorization. Labels help users discover your customizations through search and filtering.
+
+#### Documentation Structure
+
+Documentation follows the same organizational structure as the customizations in the `windsurf/` directory. Each customization in the `windsurf/` directory must have a corresponding documentation file in the `docs/` directory with the same relative path and filename.
+
+For example:
+- `windsurf/rules/language/typescript.md` → `docs/rules/language/typescript.md`
+- `windsurf/workflows/setup/node-project.md` → `docs/workflows/setup/node-project.md`
 
 ### 6. Quality Guidelines
 
@@ -96,7 +115,7 @@ created: [YYYY-MM-DD]
 ### 8. Pull Request Requirements
 
 Your PR must include:
-- [ ] Customization file in correct `.windsurf/` location
+- [ ] Customization file in correct `windsurf/` location
 - [ ] Documentation file in corresponding `docs/` location
 - [ ] Proper YAML frontmatter in documentation
 - [ ] Clear description of the customization's purpose

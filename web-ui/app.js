@@ -63,13 +63,9 @@ class CascadeCatalog {
             }
         }
         
-        // If no files were loaded, use sample data
-        if (loadedCount === 0 && typeof SAMPLE_CUSTOMIZATIONS !== 'undefined') {
-            console.log('Using sample data as fallback');
-            this.customizations = SAMPLE_CUSTOMIZATIONS;
-            this.customizations.forEach(customization => {
-                customization.labels.forEach(label => this.allLabels.add(label));
-            });
+        // Log if no customizations were loaded
+        if (loadedCount === 0) {
+            console.warn('No customizations were loaded. Please ensure the markdown files are available.');
         }
     }
 

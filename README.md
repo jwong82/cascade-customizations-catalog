@@ -54,12 +54,37 @@ docs/
 └── labels.md             # Standardized labels for categorization
 ```
 
+## Browse the Catalog
+
+### 🌐 Web Interface
+**[Browse the Catalog Online](https://windsurf-samples.github.io/cascade-customizations-catalog/web-ui/index.html)**
+
+Use our interactive web interface to easily browse, search, and discover customizations. The web catalog provides:
+
+- **Search and Filter**: Find customizations by name, category, or keywords
+- **Live Preview**: View rule and workflow content directly in the browser
+- **Easy Copy**: One-click copying of customization files
+- **Category Navigation**: Browse by framework, language, or use case
+- **Documentation Links**: Direct access to detailed documentation
+
+### 🔍 Semantic Search
+**[Ask Questions with DeepWiki](https://deepwiki.com/Windsurf-Samples/cascade-customizations-catalog)**
+
+Use natural language to semantically search through all rules and workflows. Ask questions like:
+- "Help me write a rule for TypeScript best practices"
+- "What workflows are available that help with deployment to Kubernetes?"
+- "Show me security-focused rules for React projects"
+- "Find testing workflows for Node.js applications"
+
+DeepWiki provides intelligent, context-aware answers by understanding the content and relationships within the catalog.
+
 ## Getting Started
 
-1. Browse the `windsurf/rules/` and `windsurf/workflows/` directories to find customizations
-2. Check the corresponding `docs/` entries for detailed descriptions and usage examples
-3. Copy the customization files to your own project's `.windsurf/` directory
-4. Refer to the [Windsurf documentation](https://docs.windsurf.com/windsurf/cascade/workflows) for more information
+1. **Browse Online**: Visit the [web catalog](https://windsurf-samples.github.io/cascade-customizations-catalog/web-ui/index.html) to explore available customizations
+2. **Local Browsing**: Alternatively, browse the `windsurf/rules/` and `windsurf/workflows/` directories directly
+3. **Documentation**: Check the corresponding `docs/` entries for detailed descriptions and usage examples
+4. **Installation**: Copy the customization files to your own project's `.windsurf/` directory
+5. **Learn More**: Refer to the [Windsurf documentation](https://docs.windsurf.com/windsurf/cascade/workflows) for more information
 
 ## Contributing
 
