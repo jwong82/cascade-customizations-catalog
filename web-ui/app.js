@@ -87,9 +87,9 @@ class CascadeCatalog {
         
         // Determine type and category from path
         const pathParts = path.split('/');
-        const type = pathParts[1]; // 'rules' or 'workflows'
-        const category = pathParts[2];
-        const filename = pathParts[3];
+        const type = pathParts[2]; // 'rules' or 'workflows' (after '../docs/')
+        const category = pathParts[3];
+        const filename = pathParts[4];
         
         // Get corresponding windsurf file path
         const windsurfPath = path.replace('../docs/', '../windsurf/');
@@ -704,8 +704,8 @@ class CascadeCatalog {
         // Set type badge
         const typeSpan = document.getElementById('modalType');
         const typeColor = customization.type === 'rules' ? 'blue' : 'purple';
-        typeSpan.className = `px-3 py-1 rounded-full text-sm font-medium bg-${typeColor}-100 text-${typeColor}-800`;
-        typeSpan.textContent = customization.type.charAt(0).toUpperCase() + customization.type.slice(1, -1);
+        typeSpan.className = `px-3 py-1.5 rounded-md text-sm font-semibold bg-${typeColor}-600 text-white border-2 border-${typeColor}-700 shadow-sm`;
+        typeSpan.textContent = customization.type === 'rules' ? 'Rule' : 'Workflow';
         
         // Set labels
         const modalLabels = document.getElementById('modalLabels');
