@@ -19,22 +19,46 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
         .tag {
-            @apply inline-block bg-blue-100 text-blue-800 text-xs px-3 py-1.5 rounded-full mr-2 mb-2 border border-blue-200 font-medium transition-all duration-200 hover:bg-blue-200;
+            display: inline-block;
+            font-size: 0.75rem;
+            line-height: 1rem;
+            padding: 0.375rem 0.5rem;
+            margin-right: 0.25rem;
+            margin-bottom: 0.25rem;
+            border-radius: 0.25rem;
+            border-width: 1px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            white-space: nowrap;
+            vertical-align: middle;
         }
         .tag.active {
-            @apply bg-gray-800 text-white border-gray-800 shadow-md ring-2 ring-blue-300;
+            background-color: #1f2937;
+            color: white;
+            border-color: #1f2937;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            outline: 2px solid #93c5fd;
         }
         .tag.active.bg-green-100 {
-            @apply bg-green-700 text-white border-green-700;
+            background-color: #15803d !important;
+            color: white !important;
+            border-color: #15803d !important;
         }
         .tag.active.bg-purple-100 {
-            @apply bg-purple-700 text-white border-purple-700;
+            background-color: #7c3aed !important;
+            color: white !important;
+            border-color: #7c3aed !important;
         }
         .tag.active.bg-yellow-100 {
-            @apply bg-yellow-700 text-white border-yellow-700;
+            background-color: #a16207 !important;
+            color: white !important;
+            border-color: #a16207 !important;
         }
         .tag.active.bg-red-100 {
-            @apply bg-red-700 text-white border-red-700;
+            background-color: #dc2626 !important;
+            color: white !important;
+            border-color: #dc2626 !important;
         }
         .tag:hover {
             transform: translateY(-1px);
@@ -109,14 +133,34 @@
                 </div>
             </div>
             
-            <!-- Label Filters -->
-            <div class="mt-6 p-4 bg-gray-50 rounded-lg border">
-                <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                    <i class="fas fa-tags mr-2 text-gray-500"></i>
-                    Filter by labels:
-                </h3>
-                <div id="labelFilters" class="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                    <!-- Labels will be populated by JavaScript -->
+            <!-- Label Filters Section -->
+            <div class="mt-6 flex flex-row gap-4">
+                <!-- Label Filters -->
+                <div class="flex-1 p-4 bg-gray-50 rounded-lg border">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                        <i class="fas fa-tags mr-2 text-gray-500"></i>
+                        Filter by labels:
+                    </h3>
+                    <div id="labelFilters" class="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
+                        <!-- Labels will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Label Color Guide (Outside) -->
+                <div id="labelColorGuide" class="w-64 p-3 bg-gray-100 rounded-lg text-sm self-start sticky top-4">
+                    <p class="font-medium mb-2">Label Color Guide:</p>
+                    <div class="flex flex-col gap-2">
+                        <span class="tag bg-green-100 text-green-800 border-green-200 cursor-pointer category-filter" data-category="Languages">Languages</span>
+                        <span class="tag bg-purple-100 text-purple-800 border-purple-200 cursor-pointer category-filter" data-category="Frameworks & Libraries">Frameworks & Libraries</span>
+                        <span class="tag bg-yellow-100 text-yellow-800 border-yellow-200 cursor-pointer category-filter" data-category="Technologies & Tools">Technologies & Tools</span>
+                        <span class="tag bg-blue-100 text-blue-800 border-blue-200 cursor-pointer category-filter" data-category="Development Areas">Development Areas</span>
+                        <span class="tag bg-red-100 text-red-800 border-red-200 cursor-pointer category-filter" data-category="Practices & Methodologies">Practices & Methodologies</span>
+                        <span class="tag bg-indigo-100 text-indigo-800 border-indigo-200 cursor-pointer category-filter" data-category="Project Types">Project Types</span>
+                        <span class="tag bg-orange-100 text-orange-800 border-orange-200 cursor-pointer category-filter" data-category="Workflow Types">Workflow Types</span>
+                        <span class="tag bg-teal-100 text-teal-800 border-teal-200 cursor-pointer category-filter" data-category="Rule Activation Types">Rule Activation Types</span>
+                        <span class="tag bg-pink-100 text-pink-800 border-pink-200 cursor-pointer category-filter" data-category="Difficulty Levels">Difficulty Levels</span>
+                        <span class="tag bg-gray-100 text-gray-800 border-gray-200 cursor-pointer category-filter" data-category="Team Roles">Team Roles</span>
+                    </div>
                 </div>
             </div>
         </div>

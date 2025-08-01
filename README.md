@@ -35,9 +35,9 @@ Workflows can be used for one time tasks like project setup or repeated tasks li
 windsurf/
 ├── rules/
 ├── ├── <top-level-aggregation>/<sub-aggregation>/<rule-name>.md
-│   ├── framework/         # Framework-specific rules
-│   ├── general/         # General rules
-│   ├── language/          # Language-specific rules
+│   ├── framework/        # Framework-specific rules
+│   ├── general/          # General rules
+│   ├── language/         # Language-specific rules
 │   ├── security/         # Security-focused rules
 │   ├── style/            # Code style and formatting rules
 │   └── testing/          # Testing-related rules
@@ -51,7 +51,7 @@ windsurf/
 docs/
 ├── rules/                # Documentation for all rules
 ├── workflows/            # Documentation for all workflows
-└── labels.md            # Standardized labels for categorization
+└── labels.md             # Standardized labels for categorization
 ```
 
 ## Getting Started

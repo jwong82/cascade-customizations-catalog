@@ -6,10 +6,12 @@ class CascadeCatalog {
         this.activeFilters = {
             type: 'all',
             labels: new Set(),
-            search: ''
+            search: '',
+            category: null
         };
         this.allLabels = new Set();
         this.currentView = 'grid';
+        this.labelsByCategory = {};
         
         this.init();
     }
@@ -161,6 +163,23 @@ class CascadeCatalog {
         
         // Clear all filters
         document.getElementById('clearAllFilters').addEventListener('click', () => this.clearAllFilters());
+        
+        // Category filters
+        document.querySelectorAll('.category-filter').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const category = e.target.dataset.category;
+                this.setCategoryFilter(category);
+            });
+        });
+        
+        // Active filter removal (delegated event listener)
+        document.getElementById('activeFilters').addEventListener('click', (e) => {
+            if (e.target.classList.contains('filter-tag')) {
+                const filterType = e.target.dataset.filterType;
+                const filterValue = e.target.dataset.filterValue;
+                this.removeFilter(filterType, filterValue);
+            }
+        });
     }
 
     setTypeFilter(type) {
@@ -186,12 +205,111 @@ class CascadeCatalog {
 
     renderLabelFilters() {
         const container = document.getElementById('labelFilters');
-        const sortedLabels = Array.from(this.allLabels).sort();
         
-        container.innerHTML = sortedLabels.map(label => {
-            const colorClass = this.getLabelColorClass(label);
-            return `<button class="tag label-filter ${colorClass}" data-label="${label}">${label}</button>`;
+        // Clear the container first
+        container.innerHTML = '';
+        
+        // Define label categories from docs/labels.md
+        const labelCategories = {
+            'Languages': ['javascript', 'typescript', 'python', 'java', 'csharp', 'cpp', 'rust', 'go', 'php', 'ruby', 'swift', 'kotlin', 'dart'],
+            'Frameworks & Libraries': ['react', 'vue', 'angular', 'svelte', 'nextjs', 'nuxtjs', 'express', 'fastapi', 'django', 'flask', 'spring', 'dotnet', 'laravel', 'rails'],
+            'Technologies & Tools': ['docker', 'kubernetes', 'git', 'github', 'gitlab', 'jenkins', 'circleci', 'github-actions', 'aws', 'azure', 'gcp', 'terraform', 'ansible', 'nginx', 'apache', 'redis', 'mongodb', 'postgresql', 'mysql', 'elasticsearch', 'rabbitmq', 'kafka', 'graphql', 'rest', 'grpc', 'webpack', 'vite', 'babel', 'eslint', 'prettier', 'jest', 'cypress', 'playwright', 'storybook', 'figma', 'postman', 'swagger', 'prometheus', 'grafana', 'sentry', 'datadog'],
+            'Development Areas': ['frontend', 'backend', 'fullstack', 'mobile', 'desktop', 'web', 'api', 'database', 'devops', 'cloud'],
+            'Practices & Methodologies': ['testing', 'security', 'performance', 'accessibility', 'documentation', 'code-review', 'refactoring', 'debugging', 'monitoring', 'logging'],
+            'Project Types': ['startup', 'enterprise', 'open-source', 'prototype', 'production', 'legacy'],
+            'Workflow Types': ['setup', 'deployment', 'ci-cd', 'maintenance', 'migration', 'backup', 'monitoring'],
+            'Rule Activation Types': ['always-on', 'model-decision', 'glob-based', 'manual'],
+            'Difficulty Levels': ['beginner', 'intermediate', 'advanced', 'expert'],
+            'Team Roles': ['developer', 'team-lead', 'architect', 'devops', 'qa', 'designer']
+        };
+        
+        // Store labels by category for filtering
+        this.labelsByCategory = {};
+        
+        // Get all labels from customizations
+        const allLabelsSet = this.allLabels;
+        
+        // Collect all labels across categories
+        const allLabels = [];
+        Object.entries(labelCategories).forEach(([category, labels]) => {
+            // Initialize the category in labelsByCategory
+            this.labelsByCategory[category] = [];
+            
+            // Process all labels from the category
+            labels.forEach(label => {
+                // Check if the label exists in customizations
+                const exists = allLabelsSet.has(label);
+                
+                // Add to category collection
+                this.labelsByCategory[category].push(label);
+                
+                // Add to all labels collection
+                allLabels.push({
+                    name: label,
+                    category: category,
+                    exists: exists
+                });
+            });
+        });
+        
+        // Sort all labels alphabetically
+        allLabels.sort((a, b) => a.name.localeCompare(b.name));
+        
+        // Filter labels by category if a category filter is active
+        let labelsToShow = allLabels;
+        if (this.activeFilters.category) {
+            labelsToShow = allLabels.filter(label => label.category === this.activeFilters.category);
+        }
+        
+        // Create a single container for all labels
+        const labelsContainer = document.createElement('div');
+        labelsContainer.className = 'flex flex-wrap gap-1';
+        
+        // Add filtered labels
+        labelsContainer.innerHTML = labelsToShow.map(label => {
+            const colorClass = this.getLabelColorClass(label.name);
+            const isActive = this.activeFilters.labels.has(label.name) ? 'active' : '';
+            const opacity = label.exists ? '' : 'opacity-40';
+            const tooltip = label.exists ? 
+                `${label.category}` : 
+                `${label.category} (No matching items yet)`;
+            
+            return `<button class="tag label-filter ${colorClass} ${isActive} ${opacity}" data-label="${label.name}" title="${tooltip}">${label.name}</button>`;
         }).join('');
+        
+        container.appendChild(labelsContainer);
+        
+        // Add a "Show All" button when filtering by category
+        if (this.activeFilters.category) {
+            const showAllBtn = document.createElement('button');
+            showAllBtn.className = 'mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium';
+            showAllBtn.innerHTML = '<i class="fas fa-times-circle mr-1"></i> Clear category filter';
+            showAllBtn.addEventListener('click', () => this.clearCategoryFilter());
+            container.appendChild(showAllBtn);
+        }
+        
+        // Add any remaining labels that weren't categorized
+        const categorizedLabels = Object.values(labelCategories).flat();
+        const uncategorizedLabels = Array.from(allLabelsSet)
+            .filter(label => !categorizedLabels.includes(label))
+            .sort();
+            
+        if (uncategorizedLabels.length > 0) {
+            const heading = document.createElement('h3');
+            heading.className = 'text-sm font-medium text-gray-700 mt-6 mb-2';
+            heading.textContent = 'Other Labels';
+            container.appendChild(heading);
+            
+            const labelsContainer = document.createElement('div');
+            labelsContainer.className = 'flex flex-wrap gap-2 mb-4';
+            
+            labelsContainer.innerHTML = uncategorizedLabels.map(label => {
+                const colorClass = this.getLabelColorClass(label);
+                return `<button class="tag label-filter ${colorClass}" data-label="${label}">${label}</button>`;
+            }).join('');
+            
+            container.appendChild(labelsContainer);
+        }
 
         // Add click handlers
         container.addEventListener('click', (e) => {
@@ -203,23 +321,38 @@ class CascadeCatalog {
     }
 
     getLabelColorClass(label) {
-        // Categorize labels by type for color coding
-        const languageLabels = ['javascript', 'typescript', 'python', 'java', 'csharp', 'cpp', 'rust', 'go', 'php', 'ruby', 'swift', 'kotlin', 'dart'];
-        const frameworkLabels = ['react', 'vue', 'angular', 'svelte', 'nextjs', 'nuxtjs', 'express', 'fastapi', 'django', 'flask', 'spring', 'dotnet', 'laravel', 'rails'];
-        const toolLabels = ['docker', 'kubernetes', 'git', 'github', 'gitlab', 'jenkins', 'webpack', 'vite', 'eslint', 'prettier', 'jest', 'cypress'];
-        const practiceLabels = ['security', 'testing', 'performance', 'accessibility', 'best-practices', 'code-quality', 'debugging'];
-        
-        if (languageLabels.includes(label)) {
-            return 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200';
-        } else if (frameworkLabels.includes(label)) {
-            return 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200';
-        } else if (toolLabels.includes(label)) {
-            return 'bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200';
-        } else if (practiceLabels.includes(label)) {
-            return 'bg-red-100 text-red-800 border-red-200 hover:bg-red-200';
-        } else {
-            return 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200';
+        // Find which category this label belongs to
+        for (const [category, labels] of Object.entries(this.labelsByCategory)) {
+            if (labels.includes(label)) {
+                switch(category) {
+                    case 'Languages':
+                        return 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200';
+                    case 'Frameworks & Libraries':
+                        return 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200';
+                    case 'Technologies & Tools':
+                        return 'bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200';
+                    case 'Development Areas':
+                        return 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200';
+                    case 'Practices & Methodologies':
+                        return 'bg-red-100 text-red-800 border-red-200 hover:bg-red-200';
+                    case 'Project Types':
+                        return 'bg-indigo-100 text-indigo-800 border-indigo-200 hover:bg-indigo-200';
+                    case 'Workflow Types':
+                        return 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200';
+                    case 'Rule Activation Types':
+                        return 'bg-teal-100 text-teal-800 border-teal-200 hover:bg-teal-200';
+                    case 'Difficulty Levels':
+                        return 'bg-pink-100 text-pink-800 border-pink-200 hover:bg-pink-200';
+                    case 'Team Roles':
+                        return 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200';
+                    default:
+                        return 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200';
+                }
+            }
         }
+        
+        // Fallback for uncategorized labels
+        return 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200';
     }
 
     toggleLabelFilter(label) {
@@ -253,8 +386,82 @@ class CascadeCatalog {
         // Reset type filter to 'all'
         this.setTypeFilter('all');
         
+        // Clear category filter
+        this.clearCategoryFilter();
+        
         this.updateActiveFiltersDisplay();
         this.filterAndRender();
+    }
+    
+    setCategoryFilter(category) {
+        // Set the active category filter
+        this.activeFilters.category = category;
+        
+        // Update visual state of category buttons
+        document.querySelectorAll('.category-filter').forEach(btn => {
+            if (btn.dataset.category === category) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        
+        // Re-render the label filters to show only labels from this category
+        this.renderLabelFilters();
+        
+        // Update the active filters display
+        this.updateActiveFiltersDisplay();
+    }
+    
+    clearCategoryFilter() {
+        // Clear the category filter
+        this.activeFilters.category = null;
+        
+        // Reset all category filter buttons
+        document.querySelectorAll('.category-filter').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Re-render the label filters to show all labels
+        this.renderLabelFilters();
+        
+        // Update the active filters display
+        this.updateActiveFiltersDisplay();
+    }
+    
+    removeFilter(filterType, filterValue) {
+        switch(filterType) {
+            case 'type':
+                // Reset type filter to 'all'
+                this.setTypeFilter('all');
+                break;
+                
+            case 'category':
+                // Clear category filter
+                this.clearCategoryFilter();
+                break;
+                
+            case 'search':
+                // Clear search input
+                document.getElementById('searchInput').value = '';
+                this.activeFilters.search = '';
+                this.updateActiveFiltersDisplay();
+                this.filterAndRender();
+                break;
+                
+            case 'label':
+                // Remove the label from active filters
+                this.activeFilters.labels.delete(filterValue);
+                
+                // Update button state
+                document.querySelectorAll(`[data-label="${filterValue}"]`).forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                this.updateActiveFiltersDisplay();
+                this.filterAndRender();
+                break;
+        }
     }
     
     updateActiveFiltersDisplay() {
@@ -263,7 +470,8 @@ class CascadeCatalog {
         
         const hasActiveFilters = this.activeFilters.labels.size > 0 || 
                                 this.activeFilters.search || 
-                                this.activeFilters.type !== 'all';
+                                this.activeFilters.type !== 'all' ||
+                                this.activeFilters.category !== null;
         
         if (hasActiveFilters) {
             activeFiltersSection.classList.remove('hidden');
@@ -272,18 +480,59 @@ class CascadeCatalog {
             
             // Add type filter if not 'all'
             if (this.activeFilters.type !== 'all') {
-                filterTags.push(`<span class="tag text-xs bg-indigo-100 text-indigo-800 border-indigo-200">Type: ${this.activeFilters.type}</span>`);
+                filterTags.push(`<span class="tag bg-indigo-100 text-indigo-800 border-indigo-200 cursor-pointer filter-tag" data-filter-type="type" data-filter-value="${this.activeFilters.type}">Type: ${this.activeFilters.type}</span>`);
+            }
+            
+            // Add category filter if present
+            if (this.activeFilters.category) {
+                // Get the color class based on the category
+                let colorClass = '';
+                switch(this.activeFilters.category) {
+                    case 'Languages':
+                        colorClass = 'bg-green-100 text-green-800 border-green-200';
+                        break;
+                    case 'Frameworks & Libraries':
+                        colorClass = 'bg-purple-100 text-purple-800 border-purple-200';
+                        break;
+                    case 'Technologies & Tools':
+                        colorClass = 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                        break;
+                    case 'Development Areas':
+                        colorClass = 'bg-blue-100 text-blue-800 border-blue-200';
+                        break;
+                    case 'Practices & Methodologies':
+                        colorClass = 'bg-red-100 text-red-800 border-red-200';
+                        break;
+                    case 'Project Types':
+                        colorClass = 'bg-indigo-100 text-indigo-800 border-indigo-200';
+                        break;
+                    case 'Workflow Types':
+                        colorClass = 'bg-orange-100 text-orange-800 border-orange-200';
+                        break;
+                    case 'Rule Activation Types':
+                        colorClass = 'bg-teal-100 text-teal-800 border-teal-200';
+                        break;
+                    case 'Difficulty Levels':
+                        colorClass = 'bg-pink-100 text-pink-800 border-pink-200';
+                        break;
+                    case 'Team Roles':
+                        colorClass = 'bg-gray-100 text-gray-800 border-gray-200';
+                        break;
+                    default:
+                        colorClass = 'bg-gray-100 text-gray-800 border-gray-200';
+                }
+                filterTags.push(`<span class="tag ${colorClass} cursor-pointer filter-tag" data-filter-type="category" data-filter-value="${this.activeFilters.category}">Category: ${this.activeFilters.category}</span>`);
             }
             
             // Add search filter if present
             if (this.activeFilters.search) {
-                filterTags.push(`<span class="tag text-xs bg-gray-100 text-gray-800 border-gray-200">Search: "${this.activeFilters.search}"</span>`);
+                filterTags.push(`<span class="tag bg-gray-100 text-gray-800 border-gray-200 cursor-pointer filter-tag" data-filter-type="search" data-filter-value="${this.activeFilters.search}">Search: "${this.activeFilters.search}"</span>`);
             }
             
             // Add label filters
             Array.from(this.activeFilters.labels).forEach(label => {
                 const colorClass = this.getLabelColorClass(label);
-                filterTags.push(`<span class="tag text-xs ${colorClass}">${label}</span>`);
+                filterTags.push(`<span class="tag ${colorClass} cursor-pointer filter-tag" data-filter-type="label" data-filter-value="${label}">${label}</span>`);
             });
             
             activeFiltersContainer.innerHTML = filterTags.join('');
@@ -384,9 +633,9 @@ class CascadeCatalog {
                     <div class="mb-3">
                         <div class="flex flex-wrap gap-1.5">
                             ${customization.labels.slice(0, 3).map(label => 
-                                `<span class="tag text-xs ${this.getLabelColorClass(label)}">${label}</span>`
+                                `<span class="tag ${this.getLabelColorClass(label)}">${label}</span>`
                             ).join('')}
-                            ${customization.labels.length > 3 ? `<span class="tag text-xs bg-gray-200 text-gray-600 border-gray-300">+${customization.labels.length - 3} more</span>` : ''}
+                            ${customization.labels.length > 3 ? `<span class="tag bg-gray-200 text-gray-600 border-gray-300">+${customization.labels.length - 3} more</span>` : ''}
                         </div>
                     </div>
                     
@@ -421,7 +670,7 @@ class CascadeCatalog {
                         <div class="mb-3">
                             <div class="flex flex-wrap gap-1.5">
                                 ${customization.labels.map(label => 
-                                    `<span class="tag text-xs ${this.getLabelColorClass(label)}">${label}</span>`
+                                    `<span class="tag ${this.getLabelColorClass(label)}">${label}</span>`
                                 ).join('')}
                             </div>
                         </div>
@@ -465,7 +714,7 @@ class CascadeCatalog {
         // Set labels
         const modalLabels = document.getElementById('modalLabels');
         modalLabels.innerHTML = customization.labels.map(label => 
-            `<span class="tag text-xs ${this.getLabelColorClass(label)}">${label}</span>`
+            `<span class="tag ${this.getLabelColorClass(label)}">${label}</span>`
         ).join('');
         modalLabels.className = 'flex flex-wrap gap-1.5 max-w-md';
         
@@ -530,7 +779,7 @@ class CascadeCatalog {
     }
 }
 
-// Add CSS for filter buttons
+// Add CSS for filter buttons and modal content styling
 const style = document.createElement('style');
 style.textContent = `
     .filter-btn {
@@ -554,6 +803,63 @@ style.textContent = `
         -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
+    }
+    /* Modal content typography styles */
+    #modalContent h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        color: #111827;
+    }
+    #modalContent h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+        color: #1f2937;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 0.5rem;
+    }
+    #modalContent h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-top: 1.25rem;
+        margin-bottom: 1rem;
+        color: #374151;
+    }
+    #modalContent h4 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        color: #4b5563;
+    }
+    #modalContent p {
+        margin-bottom: 1rem;
+        line-height: 1.6;
+        color: #4b5563;
+    }
+    #modalContent ul, #modalContent ol {
+        margin-bottom: 1rem;
+        padding-left: 1.5rem;
+    }
+    #modalContent li {
+        margin-bottom: 0.5rem;
+    }
+    #modalContent code {
+        background-color: #f3f4f6;
+        padding: 0.2rem 0.4rem;
+        border-radius: 0.25rem;
+        font-family: monospace;
+        font-size: 0.9em;
+    }
+    #modalContent pre {
+        margin-bottom: 1rem;
+        background-color: #1f2937;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
     }
 `;
 document.head.appendChild(style);
