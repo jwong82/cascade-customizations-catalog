@@ -33,9 +33,11 @@ jobs:
           
       - name: Copy web-ui files to build directory
         run: |
+          # Remove any existing web-ui directory in build output
+          rm -rf _site/web-ui
           # Create web-ui directory in the build output
           mkdir -p _site/web-ui
-          # Copy web-ui files (Jekyll should have excluded this directory from processing)
+          # Copy web-ui files (Jekyll excludes this directory from processing)
           cp -r web-ui/* _site/web-ui/
 
       - name: Upload artifact
