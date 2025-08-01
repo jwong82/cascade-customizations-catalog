@@ -20,7 +20,6 @@ exclude:
   - node_modules/
   - .git/
   - .gitignore
-  - web-ui/
 
 # Include files that start with underscore
 include:
