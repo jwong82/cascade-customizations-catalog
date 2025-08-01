@@ -29,19 +29,23 @@ class CascadeCatalog {
     }
 
     async loadCustomizations() {
-        // Try to load from GitHub API first, then fall back to direct file access
+        // Detect if we're running on GitHub Pages or locally
+        // Temporarily force GitHub Pages mode for testing
+        const isGitHubPages = window.location.hostname.includes('github.io') || window.location.search.includes('test-gh-pages');
+        const basePath = isGitHubPages ? '/cascade-customizations' : '..';
+        
         const customizationPaths = [
             // Rules
-            '../docs/rules/language/typescript.md',
-            '../docs/rules/framework/react.md',
-            '../docs/rules/security/secure-coding.md',
-            '../docs/rules/style/code-review-checklist.md',
-            '../docs/rules/general/coding-best-practices.md',
+            `${basePath}/docs/rules/language/typescript.md`,
+            `${basePath}/docs/rules/framework/react.md`,
+            `${basePath}/docs/rules/security/secure-coding.md`,
+            `${basePath}/docs/rules/style/code-review-checklist.md`,
+            `${basePath}/docs/rules/general/coding-best-practices.md`,
             
             // Workflows
-            '../docs/workflows/setup/node-project-setup.md',
-            '../docs/workflows/setup/dev-environment-setup.md',
-            '../docs/workflows/maintenance/debugging-issues.md'
+            `${basePath}/docs/workflows/setup/node-project-setup.md`,
+            `${basePath}/docs/workflows/setup/dev-environment-setup.md`,
+            `${basePath}/docs/workflows/maintenance/debugging-issues.md`
         ];
 
         let loadedCount = 0;
