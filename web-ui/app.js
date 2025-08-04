@@ -35,11 +35,13 @@ class CascadeCatalog {
         // Dynamically determine the base path for any repository
         let basePath;
         if (isGitHubPages) {
-            // Extract repository name from URL: https://user.github.io/repo-name/
+            // For GitHub Pages, the structure is: https://user.github.io/repo-name/web-ui/
+            // We need to go back to the repo root to access /docs/
             const pathParts = window.location.pathname.split('/').filter(part => part);
             const repoName = pathParts[0] || 'cascade-customizations-catalog';
             basePath = `/${repoName}`;
         } else {
+            // For local development, go up one directory from web-ui to project root
             basePath = '..';
         }
         
