@@ -125,12 +125,19 @@ class CascadeCatalog {
         
         // Determine type and category from path
         const pathParts = path.split('/');
-        const type = pathParts[1]; // 'rules' or 'workflows'
-        const category = pathParts[2];
-        const filename = pathParts[3];
         
-        // Get corresponding windsurf file path
-        const windsurfPath = path.replace('../docs/', '../windsurf/');
+        // Find the 'docs' index to properly parse the path structure
+        const docsIndex = pathParts.findIndex(part => part === 'docs');
+        if (docsIndex === -1) return null; // Invalid path structure
+        
+        const type = pathParts[docsIndex + 1]; // 'rules' or 'workflows'
+        const category = pathParts[docsIndex + 2];
+        const filename = pathParts[docsIndex + 3];
+        
+        // Get corresponding windsurf file path (adjust based on environment)
+        const windsurfPath = isGitHubPages 
+            ? path.replace('/docs/', '/windsurf/').replace('.html', '.md')
+            : path.replace('../docs/', '../windsurf/').replace('.md', '.md');
         
         return {
             id: path.replace(/[^a-zA-Z0-9]/g, '_'),
@@ -759,7 +766,15 @@ class CascadeCatalog {
         this.currentCustomization = customization;
         
         document.getElementById('modalTitle').textContent = customization.title;
-        document.getElementById('modalContent').innerHTML = marked.parse(customization.content);
+        // Handle content based on environment
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        if (isGitHubPages) {
+            // For GitHub Pages, content is already HTML
+            document.getElementById('modalContent').innerHTML = customization.content;
+        } else {
+            // For local development, parse markdown
+            document.getElementById('modalContent').innerHTML = marked.parse(customization.content);
+        }
         
         // Set type badge
         const typeSpan = document.getElementById('modalType');
