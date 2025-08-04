@@ -32,31 +32,33 @@ class CascadeCatalog {
         // Detect if we're running on GitHub Pages or locally
         const isGitHubPages = window.location.hostname.includes('github.io');
         
-        // Dynamically determine the base path for any repository
-        let basePath;
+        // Dynamically determine the base path and file extension
+        let basePath, fileExtension;
         if (isGitHubPages) {
-            // For GitHub Pages, the structure is: https://user.github.io/repo-name/web-ui/
-            // We need to go back to the repo root to access /docs/
+            // For GitHub Pages, Jekyll converts .md to .html
+            // Structure: https://user.github.io/repo-name/web-ui/
             const pathParts = window.location.pathname.split('/').filter(part => part);
             const repoName = pathParts[0] || 'cascade-customizations-catalog';
             basePath = `/${repoName}`;
+            fileExtension = '.html';
         } else {
-            // For local development, go up one directory from web-ui to project root
+            // For local development, serve raw .md files
             basePath = '..';
+            fileExtension = '.md';
         }
         
         const customizationPaths = [
             // Rules
-            `${basePath}/docs/rules/language/typescript.md`,
-            `${basePath}/docs/rules/framework/react.md`,
-            `${basePath}/docs/rules/security/secure-coding.md`,
-            `${basePath}/docs/rules/style/code-review-checklist.md`,
-            `${basePath}/docs/rules/general/coding-best-practices.md`,
+            `${basePath}/docs/rules/language/typescript${fileExtension}`,
+            `${basePath}/docs/rules/framework/react${fileExtension}`,
+            `${basePath}/docs/rules/security/secure-coding${fileExtension}`,
+            `${basePath}/docs/rules/style/code-review-checklist${fileExtension}`,
+            `${basePath}/docs/rules/general/coding-best-practices${fileExtension}`,
             
             // Workflows
-            `${basePath}/docs/workflows/setup/node-project-setup.md`,
-            `${basePath}/docs/workflows/setup/dev-environment-setup.md`,
-            `${basePath}/docs/workflows/maintenance/debugging-issues.md`
+            `${basePath}/docs/workflows/setup/node-project-setup${fileExtension}`,
+            `${basePath}/docs/workflows/setup/dev-environment-setup${fileExtension}`,
+            `${basePath}/docs/workflows/maintenance/debugging-issues${fileExtension}`
         ];
 
         let loadedCount = 0;
@@ -85,20 +87,41 @@ class CascadeCatalog {
     }
 
     parseCustomization(path, content) {
-        // Parse YAML frontmatter
-        const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-        if (!frontmatterMatch) return null;
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        let metadata = {};
+        let body = content;
+        let title = '';
+        let description = '';
+        
+        if (isGitHubPages) {
+            // For GitHub Pages HTML content, extract from HTML structure
+            // Title is in the first H1 tag
+            const titleMatch = content.match(/<h1[^>]*>([^<]+)<\/h1>/);
+            title = titleMatch ? titleMatch[1].trim() : this.getFilenameFromPath(path);
+            
+            // Description is typically after "## Description" heading
+            const descMatch = content.match(/<h2[^>]*>Description<\/h2>\s*<p>([\s\S]*?)<\/p>/);
+            description = descMatch ? descMatch[1].trim().replace(/<[^>]*>/g, '') : '';
+            
+            // Extract labels from content if available (fallback approach)
+            metadata.labels = this.extractLabelsFromContent(content);
+        } else {
+            // For local markdown content, parse YAML frontmatter
+            const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+            if (!frontmatterMatch) return null;
 
-        const [, frontmatter, body] = frontmatterMatch;
-        const metadata = this.parseYAML(frontmatter);
-        
-        // Extract title from first H1
-        const titleMatch = body.match(/^# (.+)$/m);
-        const title = titleMatch ? titleMatch[1] : this.getFilenameFromPath(path);
-        
-        // Extract description
-        const descriptionMatch = body.match(/## Description\n\n([\s\S]*?)(?=\n## |\n### |$)/);
-        const description = descriptionMatch ? descriptionMatch[1].trim() : '';
+            const [, frontmatter, markdownBody] = frontmatterMatch;
+            metadata = this.parseYAML(frontmatter);
+            body = markdownBody;
+            
+            // Extract title from first H1
+            const titleMatch = body.match(/^# (.+)$/m);
+            title = titleMatch ? titleMatch[1] : this.getFilenameFromPath(path);
+            
+            // Extract description
+            const descriptionMatch = body.match(/## Description\n\n([\s\S]*?)(?=\n## |\n### |$)/);
+            description = descriptionMatch ? descriptionMatch[1].trim() : '';
+        }
         
         // Determine type and category from path
         const pathParts = path.split('/');
@@ -118,7 +141,7 @@ class CascadeCatalog {
             filename,
             path,
             windsurfPath,
-            labels: metadata.labels ? metadata.labels.split(',').map(l => l.trim()) : [],
+            labels: metadata.labels ? (Array.isArray(metadata.labels) ? metadata.labels : metadata.labels.split(',').map(l => l.trim())) : [],
             author: metadata.author || 'Unknown',
             modified: metadata.modified || '',
             content: body
@@ -141,8 +164,30 @@ class CascadeCatalog {
     }
 
     getFilenameFromPath(path) {
-        return path.split('/').pop().replace('.md', '').replace(/-/g, ' ')
+        return path.split('/').pop().replace(/\.(md|html)$/, '').replace(/-/g, ' ')
             .replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    extractLabelsFromContent(htmlContent) {
+        // Try to extract labels from HTML content
+        // This is a fallback method for GitHub Pages where YAML frontmatter isn't available
+        const labels = [];
+        
+        // Look for common patterns in the content to infer labels
+        const content = htmlContent.toLowerCase();
+        
+        // Infer labels based on path and content
+        if (content.includes('typescript') || content.includes('ts')) labels.push('typescript');
+        if (content.includes('javascript') || content.includes('js')) labels.push('javascript');
+        if (content.includes('react')) labels.push('react');
+        if (content.includes('security') || content.includes('secure')) labels.push('security');
+        if (content.includes('best practices') || content.includes('coding')) labels.push('best-practices');
+        if (content.includes('workflow') || content.includes('setup')) labels.push('workflow');
+        if (content.includes('debugging') || content.includes('maintenance')) labels.push('debugging');
+        if (content.includes('node') || content.includes('npm')) labels.push('nodejs');
+        if (content.includes('development') || content.includes('dev')) labels.push('development');
+        
+        return labels;
     }
 
     setupEventListeners() {
