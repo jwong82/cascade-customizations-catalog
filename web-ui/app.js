@@ -28,21 +28,25 @@ class CascadeCatalog {
         document.getElementById('resultsContainer').classList.remove('hidden');
     }
 
+    /**
+     * Loads customizations with environment-aware path resolution.
+     * Handles both local development (.md files) and GitHub Pages (.html files).
+     * Dynamically extracts repository name for fork compatibility.
+     */
     async loadCustomizations() {
-        // Detect if we're running on GitHub Pages or locally
+        // Environment detection: GitHub Pages vs local development
         const isGitHubPages = window.location.hostname.includes('github.io');
         
-        // Dynamically determine the base path and file extension
+        // Configure paths and file extensions based on environment
         let basePath, fileExtension;
         if (isGitHubPages) {
-            // For GitHub Pages, Jekyll converts .md to .html
-            // Structure: https://user.github.io/repo-name/web-ui/
+            // GitHub Pages: Jekyll converts .md to .html, use absolute paths
             const pathParts = window.location.pathname.split('/').filter(part => part);
             const repoName = pathParts[0] || 'cascade-customizations-catalog';
             basePath = `/${repoName}`;
             fileExtension = '.html';
         } else {
-            // For local development, serve raw .md files
+            // Local development: serve raw .md files with relative paths
             basePath = '..';
             fileExtension = '.md';
         }
@@ -86,6 +90,11 @@ class CascadeCatalog {
         }
     }
 
+    /**
+     * Parses customization content with dual format support.
+     * Local: YAML frontmatter + markdown | GitHub Pages: HTML structure
+     * Extracts metadata using environment-appropriate parsing methods.
+     */
     parseCustomization(path, content) {
         const isGitHubPages = window.location.hostname.includes('github.io');
         let metadata = {};
@@ -94,19 +103,17 @@ class CascadeCatalog {
         let description = '';
         
         if (isGitHubPages) {
-            // For GitHub Pages HTML content, extract from HTML structure
-            // Title is in the first H1 tag
+            // GitHub Pages: Extract from Jekyll-processed HTML structure
             const titleMatch = content.match(/<h1[^>]*>([^<]+)<\/h1>/);
             title = titleMatch ? titleMatch[1].trim() : this.getFilenameFromPath(path);
             
-            // Description is typically after "## Description" heading
             const descMatch = content.match(/<h2[^>]*>Description<\/h2>\s*<p>([\s\S]*?)<\/p>/);
             description = descMatch ? descMatch[1].trim().replace(/<[^>]*>/g, '') : '';
             
-            // Extract labels from content if available (fallback approach)
+            // Fallback label extraction since YAML frontmatter is stripped
             metadata.labels = this.extractLabelsFromContent(content);
         } else {
-            // For local markdown content, parse YAML frontmatter
+            // Local development: Parse YAML frontmatter from raw markdown
             const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
             if (!frontmatterMatch) return null;
 
@@ -114,25 +121,21 @@ class CascadeCatalog {
             metadata = this.parseYAML(frontmatter);
             body = markdownBody;
             
-            // Extract title from first H1
             const titleMatch = body.match(/^# (.+)$/m);
             title = titleMatch ? titleMatch[1] : this.getFilenameFromPath(path);
             
-            // Extract description
             const descriptionMatch = body.match(/## Description\n\n([\s\S]*?)(?=\n## |\n### |$)/);
             description = descriptionMatch ? descriptionMatch[1].trim() : '';
         }
         
-        // Determine type and category from path
+        // Dynamic path parsing: handles different URL structures between environments
         const pathParts = path.split('/');
-        
-        // Find the 'docs' index to properly parse the path structure
         const docsIndex = pathParts.findIndex(part => part === 'docs');
-        if (docsIndex === -1) return null; // Invalid path structure
+        if (docsIndex === -1) return null;
         
-        const type = pathParts[docsIndex + 1]; // 'rules' or 'workflows'
-        const category = pathParts[docsIndex + 2];
-        const filename = pathParts[docsIndex + 3];
+        const type = pathParts[docsIndex + 1];     // 'rules' or 'workflows'
+        const category = pathParts[docsIndex + 2]; // category subdirectory
+        const filename = pathParts[docsIndex + 3]; // file basename
         
         // Get corresponding windsurf file path (adjust based on environment)
         const windsurfPath = isGitHubPages 
@@ -175,12 +178,13 @@ class CascadeCatalog {
             .replace(/\b\w/g, l => l.toUpperCase());
     }
 
+    /**
+     * Extracts labels from HTML content using pattern matching.
+     * Fallback method for GitHub Pages where YAML frontmatter is unavailable.
+     * Uses content analysis to infer appropriate labels.
+     */
     extractLabelsFromContent(htmlContent) {
-        // Try to extract labels from HTML content
-        // This is a fallback method for GitHub Pages where YAML frontmatter isn't available
         const labels = [];
-        
-        // Look for common patterns in the content to infer labels
         const content = htmlContent.toLowerCase();
         
         // Infer labels based on path and content
