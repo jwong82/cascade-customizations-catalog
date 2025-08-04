@@ -28,20 +28,41 @@ class CascadeCatalog {
         document.getElementById('resultsContainer').classList.remove('hidden');
     }
 
+    /**
+     * Loads customizations with environment-aware path resolution.
+     * Handles both local development (.md files) and GitHub Pages (.html files).
+     * Dynamically extracts repository name for fork compatibility.
+     */
     async loadCustomizations() {
-        // Try to load from GitHub API first, then fall back to direct file access
+        // Environment detection: GitHub Pages vs local development
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        
+        // Configure paths and file extensions based on environment
+        let basePath, fileExtension;
+        if (isGitHubPages) {
+            // GitHub Pages: Jekyll converts .md to .html, use absolute paths
+            const pathParts = window.location.pathname.split('/').filter(part => part);
+            const repoName = pathParts[0] || 'cascade-customizations-catalog';
+            basePath = `/${repoName}`;
+            fileExtension = '.html';
+        } else {
+            // Local development: serve raw .md files with relative paths
+            basePath = '..';
+            fileExtension = '.md';
+        }
+        
         const customizationPaths = [
             // Rules
-            '../docs/rules/language/typescript.md',
-            '../docs/rules/framework/react.md',
-            '../docs/rules/security/secure-coding.md',
-            '../docs/rules/style/code-review-checklist.md',
-            '../docs/rules/general/coding-best-practices.md',
+            `${basePath}/docs/rules/language/typescript${fileExtension}`,
+            `${basePath}/docs/rules/framework/react${fileExtension}`,
+            `${basePath}/docs/rules/security/secure-coding${fileExtension}`,
+            `${basePath}/docs/rules/style/code-review-checklist${fileExtension}`,
+            `${basePath}/docs/rules/general/coding-best-practices${fileExtension}`,
             
             // Workflows
-            '../docs/workflows/setup/node-project-setup.md',
-            '../docs/workflows/setup/dev-environment-setup.md',
-            '../docs/workflows/maintenance/debugging-issues.md'
+            `${basePath}/docs/workflows/setup/node-project-setup${fileExtension}`,
+            `${basePath}/docs/workflows/setup/dev-environment-setup${fileExtension}`,
+            `${basePath}/docs/workflows/maintenance/debugging-issues${fileExtension}`
         ];
 
         let loadedCount = 0;
@@ -69,30 +90,57 @@ class CascadeCatalog {
         }
     }
 
+    /**
+     * Parses customization content with dual format support.
+     * Local: YAML frontmatter + markdown | GitHub Pages: HTML structure
+     * Extracts metadata using environment-appropriate parsing methods.
+     */
     parseCustomization(path, content) {
-        // Parse YAML frontmatter
-        const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-        if (!frontmatterMatch) return null;
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        let metadata = {};
+        let body = content;
+        let title = '';
+        let description = '';
+        
+        if (isGitHubPages) {
+            // GitHub Pages: Extract from Jekyll-processed HTML structure
+            const titleMatch = content.match(/<h1[^>]*>([^<]+)<\/h1>/);
+            title = titleMatch ? titleMatch[1].trim() : this.getFilenameFromPath(path);
+            
+            const descMatch = content.match(/<h2[^>]*>Description<\/h2>\s*<p>([\s\S]*?)<\/p>/);
+            description = descMatch ? descMatch[1].trim().replace(/<[^>]*>/g, '') : '';
+            
+            // Fallback label extraction since YAML frontmatter is stripped
+            metadata.labels = this.extractLabelsFromContent(content);
+        } else {
+            // Local development: Parse YAML frontmatter from raw markdown
+            const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+            if (!frontmatterMatch) return null;
 
-        const [, frontmatter, body] = frontmatterMatch;
-        const metadata = this.parseYAML(frontmatter);
+            const [, frontmatter, markdownBody] = frontmatterMatch;
+            metadata = this.parseYAML(frontmatter);
+            body = markdownBody;
+            
+            const titleMatch = body.match(/^# (.+)$/m);
+            title = titleMatch ? titleMatch[1] : this.getFilenameFromPath(path);
+            
+            const descriptionMatch = body.match(/## Description\n\n([\s\S]*?)(?=\n## |\n### |$)/);
+            description = descriptionMatch ? descriptionMatch[1].trim() : '';
+        }
         
-        // Extract title from first H1
-        const titleMatch = body.match(/^# (.+)$/m);
-        const title = titleMatch ? titleMatch[1] : this.getFilenameFromPath(path);
-        
-        // Extract description
-        const descriptionMatch = body.match(/## Description\n\n([\s\S]*?)(?=\n## |\n### |$)/);
-        const description = descriptionMatch ? descriptionMatch[1].trim() : '';
-        
-        // Determine type and category from path
+        // Dynamic path parsing: handles different URL structures between environments
         const pathParts = path.split('/');
-        const type = pathParts[1]; // 'rules' or 'workflows'
-        const category = pathParts[2];
-        const filename = pathParts[3];
+        const docsIndex = pathParts.findIndex(part => part === 'docs');
+        if (docsIndex === -1) return null;
         
-        // Get corresponding windsurf file path
-        const windsurfPath = path.replace('../docs/', '../windsurf/');
+        const type = pathParts[docsIndex + 1];     // 'rules' or 'workflows'
+        const category = pathParts[docsIndex + 2]; // category subdirectory
+        const filename = pathParts[docsIndex + 3]; // file basename
+        
+        // Get corresponding windsurf file path (adjust based on environment)
+        const windsurfPath = isGitHubPages 
+            ? path.replace('/docs/', '/windsurf/').replace('.html', '.md')
+            : path.replace('../docs/', '../windsurf/').replace('.md', '.md');
         
         return {
             id: path.replace(/[^a-zA-Z0-9]/g, '_'),
@@ -103,7 +151,7 @@ class CascadeCatalog {
             filename,
             path,
             windsurfPath,
-            labels: metadata.labels ? metadata.labels.split(',').map(l => l.trim()) : [],
+            labels: metadata.labels ? (Array.isArray(metadata.labels) ? metadata.labels : metadata.labels.split(',').map(l => l.trim())) : [],
             author: metadata.author || 'Unknown',
             modified: metadata.modified || '',
             content: body
@@ -126,8 +174,31 @@ class CascadeCatalog {
     }
 
     getFilenameFromPath(path) {
-        return path.split('/').pop().replace('.md', '').replace(/-/g, ' ')
+        return path.split('/').pop().replace(/\.(md|html)$/, '').replace(/-/g, ' ')
             .replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    /**
+     * Extracts labels from HTML content using pattern matching.
+     * Fallback method for GitHub Pages where YAML frontmatter is unavailable.
+     * Uses content analysis to infer appropriate labels.
+     */
+    extractLabelsFromContent(htmlContent) {
+        const labels = [];
+        const content = htmlContent.toLowerCase();
+        
+        // Infer labels based on path and content
+        if (content.includes('typescript') || content.includes('ts')) labels.push('typescript');
+        if (content.includes('javascript') || content.includes('js')) labels.push('javascript');
+        if (content.includes('react')) labels.push('react');
+        if (content.includes('security') || content.includes('secure')) labels.push('security');
+        if (content.includes('best practices') || content.includes('coding')) labels.push('best-practices');
+        if (content.includes('workflow') || content.includes('setup')) labels.push('workflow');
+        if (content.includes('debugging') || content.includes('maintenance')) labels.push('debugging');
+        if (content.includes('node') || content.includes('npm')) labels.push('nodejs');
+        if (content.includes('development') || content.includes('dev')) labels.push('development');
+        
+        return labels;
     }
 
     setupEventListeners() {
@@ -699,7 +770,15 @@ class CascadeCatalog {
         this.currentCustomization = customization;
         
         document.getElementById('modalTitle').textContent = customization.title;
-        document.getElementById('modalContent').innerHTML = marked.parse(customization.content);
+        // Handle content based on environment
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        if (isGitHubPages) {
+            // For GitHub Pages, content is already HTML
+            document.getElementById('modalContent').innerHTML = customization.content;
+        } else {
+            // For local development, parse markdown
+            document.getElementById('modalContent').innerHTML = marked.parse(customization.content);
+        }
         
         // Set type badge
         const typeSpan = document.getElementById('modalType');
