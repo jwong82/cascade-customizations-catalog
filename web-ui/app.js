@@ -135,12 +135,22 @@ class CascadeCatalog {
         
         const type = pathParts[docsIndex + 1];     // 'rules' or 'workflows'
         const category = pathParts[docsIndex + 2]; // category subdirectory
-        const filename = pathParts[docsIndex + 3]; // file basename
+        const fileSeg = pathParts[docsIndex + 3];  // filename with extension
+        const baseName = fileSeg.replace(/\.(md|html)$/i, '');
+        const filename = `${baseName}.md`;
         
-        // Get corresponding windsurf file path (adjust based on environment)
-        const windsurfPath = isGitHubPages 
-            ? path.replace('/docs/', '/windsurf/').replace('.html', '.md')
-            : path.replace('../docs/', '../windsurf/').replace('.md', '.md');
+        // Compute corresponding .windsurf source path
+        let windsurfPath;
+        if (isGitHubPages) {
+            // Build raw.githubusercontent URL based on current owner/repo
+            const owner = (window.location.hostname.split('.')[0] || 'Windsurf-Samples');
+            const repoName = (window.location.pathname.split('/').filter(p => p)[0] || 'cascade-customizations-catalog');
+            const branch = 'main';
+            windsurfPath = `https://raw.githubusercontent.com/${owner}/${repoName}/${branch}/.windsurf/${type}/${category}/${baseName}.md`;
+        } else {
+            // Local dev serves from hidden .windsurf directory at repo root
+            windsurfPath = `../.windsurf/${type}/${category}/${baseName}.md`;
+        }
         
         return {
             id: path.replace(/[^a-zA-Z0-9]/g, '_'),
@@ -214,6 +224,11 @@ class CascadeCatalog {
         document.getElementById('filterRules').addEventListener('click', () => this.setTypeFilter('rules'));
         document.getElementById('filterWorkflows').addEventListener('click', () => this.setTypeFilter('workflows'));
 
+        // Sidebar toggle
+        document.getElementById('toggleFilters').addEventListener('click', () => this.toggleSidebar());
+        document.getElementById('closeSidebar').addEventListener('click', () => this.closeSidebar());
+        document.getElementById('sidebarOverlay').addEventListener('click', () => this.closeSidebar());
+
         // View toggles
         document.getElementById('gridView').addEventListener('click', () => this.setView('grid'));
         document.getElementById('listView').addEventListener('click', () => this.setView('list'));
@@ -227,9 +242,35 @@ class CascadeCatalog {
         // Modal actions
         document.getElementById('downloadBtn').addEventListener('click', () => this.downloadCurrent());
         document.getElementById('copyBtn').addEventListener('click', () => this.copyCurrent());
+        const copyRawBtn = document.getElementById('copyRawBtn');
+        if (copyRawBtn) {
+            copyRawBtn.addEventListener('click', async () => {
+                const codeEl = document.getElementById('modalRawCode');
+                const text = codeEl ? codeEl.textContent : '';
+                if (text && text !== 'Loading...') {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        const original = copyRawBtn.innerHTML;
+                        copyRawBtn.innerHTML = '<i class="fas fa-check mr-1"></i>Copied!';
+                        copyRawBtn.classList.add('bg-green-500','text-white');
+                        setTimeout(() => {
+                            copyRawBtn.innerHTML = original;
+                            copyRawBtn.classList.remove('bg-green-500','text-white');
+                        }, 1800);
+                    } catch (e) {
+                        // Fallback to fetch-based copy
+                        this.copyCurrent();
+                    }
+                } else {
+                    // If not yet loaded, fallback
+                    this.copyCurrent();
+                }
+            });
+        }
         
-        // Clear all filters
+        // Clear all filters (both buttons)
         document.getElementById('clearAllFilters').addEventListener('click', () => this.clearAllFilters());
+        document.getElementById('clearAllFiltersSidebar').addEventListener('click', () => this.clearAllFilters());
         
         // Category filters
         document.querySelectorAll('.category-filter').forEach(btn => {
@@ -336,12 +377,12 @@ class CascadeCatalog {
         labelsContainer.innerHTML = labelsToShow.map(label => {
             const colorClass = this.getLabelColorClass(label.name);
             const isActive = this.activeFilters.labels.has(label.name) ? 'active' : '';
-            const opacity = label.exists ? '' : 'opacity-40';
+            const disabled = 'cursor-pointer';
             const tooltip = label.exists ? 
                 `${label.category}` : 
                 `${label.category} (No matching items yet)`;
             
-            return `<button class="tag label-filter ${colorClass} ${isActive} ${opacity}" data-label="${label.name}" title="${tooltip}">${label.name}</button>`;
+            return `<button class="tag label-filter ${colorClass} ${isActive} ${disabled}" data-label="${label.name}" data-exists="${label.exists}" title="${tooltip}">${label.name}</button>`;
         }).join('');
         
         container.appendChild(labelsContainer);
@@ -355,33 +396,15 @@ class CascadeCatalog {
             container.appendChild(showAllBtn);
         }
         
-        // Add any remaining labels that weren't categorized
-        const categorizedLabels = Object.values(labelCategories).flat();
-        const uncategorizedLabels = Array.from(allLabelsSet)
-            .filter(label => !categorizedLabels.includes(label))
-            .sort();
-            
-        if (uncategorizedLabels.length > 0) {
-            const heading = document.createElement('h3');
-            heading.className = 'text-sm font-medium text-gray-700 mt-6 mb-2';
-            heading.textContent = 'Other Labels';
-            container.appendChild(heading);
-            
-            const labelsContainer = document.createElement('div');
-            labelsContainer.className = 'flex flex-wrap gap-2 mb-4';
-            
-            labelsContainer.innerHTML = uncategorizedLabels.map(label => {
-                const colorClass = this.getLabelColorClass(label);
-                return `<button class="tag label-filter ${colorClass}" data-label="${label}">${label}</button>`;
-            }).join('');
-            
-            container.appendChild(labelsContainer);
-        }
+        // Remove the "Other Labels" section to keep sidebar compact
 
         // Add click handlers
         container.addEventListener('click', (e) => {
             if (e.target.classList.contains('label-filter')) {
                 const label = e.target.dataset.label;
+                const exists = e.target.dataset.exists === 'true';
+                
+                // Always allow clicking on labels - apply filter regardless of whether items exist
                 this.toggleLabelFilter(label);
             }
         });
@@ -393,33 +416,21 @@ class CascadeCatalog {
             if (labels.includes(label)) {
                 switch(category) {
                     case 'Languages':
-                        return 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200';
+                        return 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200';
                     case 'Frameworks & Libraries':
-                        return 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200';
+                        return 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200';
                     case 'Technologies & Tools':
-                        return 'bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200';
+                        return 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200';
                     case 'Development Areas':
-                        return 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200';
-                    case 'Practices & Methodologies':
                         return 'bg-red-100 text-red-800 border-red-200 hover:bg-red-200';
-                    case 'Project Types':
-                        return 'bg-indigo-100 text-indigo-800 border-indigo-200 hover:bg-indigo-200';
-                    case 'Workflow Types':
-                        return 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200';
-                    case 'Rule Activation Types':
-                        return 'bg-teal-100 text-teal-800 border-teal-200 hover:bg-teal-200';
-                    case 'Difficulty Levels':
-                        return 'bg-pink-100 text-pink-800 border-pink-200 hover:bg-pink-200';
-                    case 'Team Roles':
-                        return 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200';
                     default:
-                        return 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200';
+                        return 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200';
                 }
             }
         }
         
         // Fallback for uncategorized labels
-        return 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200';
+        return 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200';
     }
 
     toggleLabelFilter(label) {
@@ -496,6 +507,32 @@ class CascadeCatalog {
         this.updateActiveFiltersDisplay();
     }
     
+    toggleSidebar() {
+        const sidebar = document.getElementById('filterSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const toggleIcon = document.getElementById('filterToggleIcon');
+        
+        const isOpen = sidebar.classList.contains('sidebar-open');
+        
+        if (isOpen) {
+            this.closeSidebar();
+        } else {
+            sidebar.classList.add('sidebar-open');
+            overlay.classList.remove('hidden');
+            toggleIcon.classList.add('rotated');
+        }
+    }
+    
+    closeSidebar() {
+        const sidebar = document.getElementById('filterSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const toggleIcon = document.getElementById('filterToggleIcon');
+        
+        sidebar.classList.remove('sidebar-open');
+        overlay.classList.add('hidden');
+        toggleIcon.classList.remove('rotated');
+    }
+    
     removeFilter(filterType, filterValue) {
         switch(filterType) {
             case 'type':
@@ -556,19 +593,16 @@ class CascadeCatalog {
                 let colorClass = '';
                 switch(this.activeFilters.category) {
                     case 'Languages':
-                        colorClass = 'bg-green-100 text-green-800 border-green-200';
-                        break;
-                    case 'Frameworks & Libraries':
-                        colorClass = 'bg-purple-100 text-purple-800 border-purple-200';
-                        break;
-                    case 'Technologies & Tools':
-                        colorClass = 'bg-yellow-100 text-yellow-800 border-yellow-200';
-                        break;
-                    case 'Development Areas':
                         colorClass = 'bg-blue-100 text-blue-800 border-blue-200';
                         break;
-                    case 'Practices & Methodologies':
-                        colorClass = 'bg-red-100 text-red-800 border-red-200';
+                    case 'Frameworks & Libraries':
+                        colorClass = 'bg-green-100 text-green-800 border-green-200';
+                        break;
+                    case 'Technologies & Tools':
+                        colorClass = 'bg-purple-100 text-purple-800 border-purple-200';
+                        break;
+                    case 'Development Areas':
+                        colorClass = 'bg-orange-100 text-orange-800 border-orange-200';
                         break;
                     case 'Project Types':
                         colorClass = 'bg-indigo-100 text-indigo-800 border-indigo-200';
@@ -687,8 +721,8 @@ class CascadeCatalog {
             <div class="bg-white rounded-lg shadow-md card-hover cursor-pointer" data-customization-id="${customization.id}">
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-${typeColor}-100 text-${typeColor}-800">
-                            <i class="${typeIcon} mr-1"></i>
+                        <span class="type-badge ${customization.type === 'rules' ? 'type-badge--rules' : 'type-badge--workflows'}">
+                            <i class="${typeIcon}"></i>
                             ${customization.type.charAt(0).toUpperCase() + customization.type.slice(1, -1)}
                         </span>
                         <span class="text-sm text-gray-500">${customization.category}</span>
@@ -724,8 +758,8 @@ class CascadeCatalog {
                 <div class="flex items-start justify-between">
                     <div class="flex-1">
                         <div class="flex items-center mb-2">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-${typeColor}-100 text-${typeColor}-800 mr-3">
-                                <i class="${typeIcon} mr-1"></i>
+                            <span class="type-badge ${customization.type === 'rules' ? 'type-badge--rules' : 'type-badge--workflows'} mr-3">
+                                <i class="${typeIcon}"></i>
                                 ${customization.type.charAt(0).toUpperCase() + customization.type.slice(1, -1)}
                             </span>
                             <span class="text-sm text-gray-500">${customization.category}</span>
@@ -782,9 +816,9 @@ class CascadeCatalog {
         
         // Set type badge
         const typeSpan = document.getElementById('modalType');
-        const typeColor = customization.type === 'rules' ? 'blue' : 'purple';
-        typeSpan.className = `px-3 py-1 rounded-full text-sm font-medium bg-${typeColor}-100 text-${typeColor}-800`;
-        typeSpan.textContent = customization.type.charAt(0).toUpperCase() + customization.type.slice(1, -1);
+        const typeIcon = customization.type === 'rules' ? 'fas fa-cogs' : 'fas fa-list-ol';
+        typeSpan.className = `type-badge ${customization.type === 'rules' ? 'type-badge--rules' : 'type-badge--workflows'}`;
+        typeSpan.innerHTML = `<i class="${typeIcon}"></i>${customization.type.charAt(0).toUpperCase() + customization.type.slice(1, -1)}`;
         
         // Set labels
         const modalLabels = document.getElementById('modalLabels');
@@ -796,7 +830,14 @@ class CascadeCatalog {
         // Show modal
         document.getElementById('customizationModal').classList.add('active');
         document.body.style.overflow = 'hidden';
+        const scrollArea = document.getElementById('modalScrollArea');
+        if (scrollArea) scrollArea.scrollTop = 0;
         
+        // Populate raw markdown viewer
+        const codeEl = document.getElementById('modalRawCode');
+        if (codeEl) codeEl.textContent = 'Loading...';
+        this.populateRawContent(customization);
+
         // Highlight code blocks
         Prism.highlightAll();
     }
@@ -804,6 +845,8 @@ class CascadeCatalog {
     closeModal() {
         document.getElementById('customizationModal').classList.remove('active');
         document.body.style.overflow = 'auto';
+        const codeEl = document.getElementById('modalRawCode');
+        if (codeEl) codeEl.textContent = '';
     }
 
     async downloadCurrent() {
@@ -852,6 +895,25 @@ class CascadeCatalog {
             alert('Copy failed. Please try again.');
         }
     }
+
+    async populateRawContent(customization) {
+        try {
+            const response = await fetch(customization.windsurfPath);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const content = await response.text();
+            const codeEl = document.getElementById('modalRawCode');
+            if (codeEl) {
+                codeEl.textContent = content;
+                if (window.Prism && typeof Prism.highlightElement === 'function') {
+                    Prism.highlightElement(codeEl);
+                }
+            }
+        } catch (err) {
+            console.warn('Failed to load raw content:', err);
+            const codeEl = document.getElementById('modalRawCode');
+            if (codeEl) codeEl.textContent = 'Unable to load source content. You can still use Download or Copy.';
+        }
+    }
 }
 
 // Add CSS for filter buttons and modal content styling
@@ -872,6 +934,35 @@ style.textContent = `
     .view-btn.active {
         background-color: #374151;
         color: white;
+    }
+    
+    /* Label filter states */
+    .label-filter {
+        transition: all 0.2s ease;
+        border-width: 1px;
+        position: relative;
+    }
+    
+    .label-filter.active {
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+        transform: scale(1.05);
+        font-weight: 600;
+    }
+    
+    .label-filter.cursor-not-allowed:hover {
+        transform: none !important;
+    }
+    
+    .label-filter:not(.cursor-not-allowed):hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Category filter states */
+    .category-filter.active {
+        background-color: rgba(59, 130, 246, 0.1);
+        border-left: 3px solid #3b82f6;
+        font-weight: 600;
     }
     .line-clamp-3 {
         display: -webkit-box;
@@ -935,6 +1026,37 @@ style.textContent = `
         padding: 1rem;
         border-radius: 0.5rem;
         overflow-x: auto;
+    }
+    /* Type badge (Rules/Workflows) */
+    .type-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem; /* ~6px */
+        height: 22px; /* consistent, slightly smaller */
+        padding: 0 8px; /* horizontal only */
+        border-radius: 9999px;
+        font-size: 0.6875rem; /* ~11px */
+        line-height: 1; /* avoid vertical expansion */
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        border: 1px solid var(--type-border);
+        background: var(--type-bg);
+        color: var(--type-text);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        white-space: nowrap;
+    }
+    .type-badge i {
+        font-size: 0.75rem; /* ~12px, visually balanced with text */
+    }
+    .type-badge--rules {
+        --type-bg: #eff6ff;     /* blue-50 */
+        --type-border: #bfdbfe; /* blue-200 */
+        --type-text: #1d4ed8;   /* blue-700 */
+    }
+    .type-badge--workflows {
+        --type-bg: #f3e8ff;     /* purple-50 */
+        --type-border: #d8b4fe; /* purple-300 */
+        --type-text: #6d28d9;   /* purple-700 */
     }
 `;
 document.head.appendChild(style);
