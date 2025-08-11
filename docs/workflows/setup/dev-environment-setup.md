@@ -147,3 +147,10 @@ lsof -i :5432
 ```
 
 This workflow ensures that every team member has a consistent, fully-functional development environment that matches the project's requirements and team standards.
+
+<!-- METADATA
+labels: development-environment, setup, onboarding, tools, configuration, git, nodejs, vscode, beginner
+author: Cascade Community
+activation: manual
+category: Workflows
+-->

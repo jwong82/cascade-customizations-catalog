@@ -75,3 +75,10 @@ const ExpensiveComponent = React.memo<Props>(({ data, onUpdate }) => {
   return prevProps.data.id === nextProps.data.id;
 });
 ```
+
+<!-- METADATA
+labels: react, javascript, typescript, frontend, hooks, functional-components, performance, jsx, model-decision, intermediate
+author: Cascade Community
+activation: model-decision
+category: Frameworks & Libraries
+-->
