@@ -113,8 +113,13 @@ class CascadeCatalog {
             const descMatch = content.match(/<h2[^>]*>Description<\/h2>\s*<p>([\s\S]*?)<\/p>/);
             description = descMatch ? descMatch[1].trim().replace(/<[^>]*>/g, '') : '';
             
-            // Fallback label extraction since YAML frontmatter is stripped
-            metadata.labels = this.extractLabelsFromContent(content);
+            // Try to extract metadata from Jekyll's HTML comments or data attributes
+            metadata = this.extractMetadataFromHTML(content);
+            
+            // If no metadata found, use enhanced content-based extraction
+            if (!metadata.labels || metadata.labels.length === 0) {
+                metadata.labels = this.extractLabelsFromContent(content);
+            }
         } else {
             // Local development: Parse YAML frontmatter from raw markdown
             const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
@@ -192,26 +197,77 @@ class CascadeCatalog {
     }
 
     /**
-     * Extracts labels from HTML content using pattern matching.
+     * Extracts metadata from Jekyll-processed HTML content.
+     * Looks for Jekyll data attributes, comments, or structured content.
+     */
+    extractMetadataFromHTML(htmlContent) {
+        const metadata = {};
+        
+        // Try to find Jekyll data in HTML comments
+        const commentMatch = htmlContent.match(/<!--\s*JEKYLL_DATA:\s*({[^}]+})\s*-->/);
+        if (commentMatch) {
+            try {
+                const data = JSON.parse(commentMatch[1]);
+                return data;
+            } catch (e) {
+                console.warn('Failed to parse Jekyll data from HTML comment');
+            }
+        }
+        
+        // Try to extract from meta tags if Jekyll adds them
+        const metaLabels = htmlContent.match(/<meta name="labels" content="([^"]+)">/);
+        if (metaLabels) {
+            metadata.labels = metaLabels[1].split(',').map(l => l.trim());
+        }
+        
+        return metadata;
+    }
+    
+    /**
+     * Enhanced label extraction from HTML content using comprehensive pattern matching.
      * Fallback method for GitHub Pages where YAML frontmatter is unavailable.
-     * Uses content analysis to infer appropriate labels.
+     * Uses content analysis and path-based inference for accurate labeling.
      */
     extractLabelsFromContent(htmlContent) {
         const labels = [];
         const content = htmlContent.toLowerCase();
         
-        // Infer labels based on path and content
-        if (content.includes('typescript') || content.includes('ts')) labels.push('typescript');
-        if (content.includes('javascript') || content.includes('js')) labels.push('javascript');
-        if (content.includes('react')) labels.push('react');
-        if (content.includes('security') || content.includes('secure')) labels.push('security');
-        if (content.includes('best practices') || content.includes('coding')) labels.push('best-practices');
-        if (content.includes('workflow') || content.includes('setup')) labels.push('workflow');
-        if (content.includes('debugging') || content.includes('maintenance')) labels.push('debugging');
-        if (content.includes('node') || content.includes('npm')) labels.push('nodejs');
-        if (content.includes('development') || content.includes('dev')) labels.push('development');
+        // Language detection (more comprehensive)
+        if (content.includes('typescript') || content.includes('ts') || content.includes('.ts') || content.includes('.tsx')) labels.push('typescript');
+        if (content.includes('javascript') || content.includes('js') || content.includes('.js') || content.includes('.jsx')) labels.push('javascript');
+        if ((content.includes('java') && !content.includes('javascript')) || content.includes('.java') || content.includes('jvm')) labels.push('java');
+        if (content.includes('python') || content.includes('.py') || content.includes('django') || content.includes('flask')) labels.push('python');
+        if (content.includes('react') || content.includes('jsx') || content.includes('hooks')) labels.push('react');
+        if (content.includes('vue') || content.includes('vuejs')) labels.push('vue');
+        if (content.includes('angular') || content.includes('ng-')) labels.push('angular');
         
-        return labels;
+        // Framework and library detection
+        if (content.includes('spring') || content.includes('springframework')) labels.push('spring');
+        if (content.includes('express') || content.includes('expressjs')) labels.push('express');
+        if (content.includes('nextjs') || content.includes('next.js')) labels.push('nextjs');
+        
+        // Practice and methodology detection
+        if (content.includes('security') || content.includes('secure') || content.includes('authentication') || content.includes('authorization')) labels.push('security');
+        if (content.includes('best practices') || content.includes('coding standards') || content.includes('code quality')) labels.push('best-practices');
+        if (content.includes('testing') || content.includes('unit test') || content.includes('integration test')) labels.push('testing');
+        if (content.includes('performance') || content.includes('optimization')) labels.push('performance');
+        
+        // Workflow and setup detection
+        if (content.includes('workflow') || content.includes('setup') || content.includes('installation')) labels.push('workflow');
+        if (content.includes('debugging') || content.includes('troubleshooting') || content.includes('maintenance')) labels.push('debugging');
+        if (content.includes('node') || content.includes('npm') || content.includes('nodejs')) labels.push('nodejs');
+        if (content.includes('development') || content.includes('dev environment') || content.includes('dev setup')) labels.push('development');
+        
+        // Skill level detection
+        if (content.includes('beginner') || content.includes('basic') || content.includes('introduction')) labels.push('beginner');
+        if (content.includes('intermediate') || content.includes('moderate')) labels.push('intermediate');
+        if (content.includes('advanced') || content.includes('expert') || content.includes('complex')) labels.push('advanced');
+        
+        // Rule engine specific (for Java rule)
+        if (content.includes('rule engine') || content.includes('business rules') || content.includes('rule-based')) labels.push('rule-engine');
+        if (content.includes('coding standards') || content.includes('style guide')) labels.push('coding-standards');
+        
+        return [...new Set(labels)]; // Remove duplicates
     }
 
     setupEventListeners() {
