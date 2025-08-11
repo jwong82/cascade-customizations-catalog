@@ -1,6 +1,7 @@
 ---
 trigger: glob
-globs: *.java
+
+globs: "*.java"
 ---
 
 Java Coding Guidelines
@@ -60,3 +61,4 @@ Performance Considerations
 Lazy Evaluation: Use lazy evaluation for expensive rule calculations.
 Caching: Cache rule evaluation results when appropriate.
 Avoid Premature Optimization: Focus on correctness first, then optimize if needed.
+
