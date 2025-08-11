@@ -54,6 +54,7 @@ class CascadeCatalog {
         const customizationPaths = [
             // Rules
             `${basePath}/docs/rules/language/typescript${fileExtension}`,
+            `${basePath}/docs/rules/language/java${fileExtension}`,
             `${basePath}/docs/rules/framework/react${fileExtension}`,
             `${basePath}/docs/rules/security/secure-coding${fileExtension}`,
             `${basePath}/docs/rules/style/code-review-checklist${fileExtension}`,
@@ -162,7 +163,7 @@ class CascadeCatalog {
             path,
             windsurfPath,
             labels: metadata.labels ? (Array.isArray(metadata.labels) ? metadata.labels : metadata.labels.split(',').map(l => l.trim())) : [],
-            author: metadata.author || 'Unknown',
+            author: metadata.author || 'Cascade Community',
             modified: metadata.modified || '',
             content: body
         };
@@ -314,8 +315,9 @@ class CascadeCatalog {
     renderLabelFilters() {
         const container = document.getElementById('labelFilters');
         
-        // Clear the container first
-        container.innerHTML = '';
+        // Remove existing event listeners by cloning the container
+        const newContainer = container.cloneNode(false);
+        container.parentNode.replaceChild(newContainer, container);
         
         // Define label categories from docs/labels.md
         const labelCategories = {
@@ -385,7 +387,7 @@ class CascadeCatalog {
             return `<button class="tag label-filter ${colorClass} ${isActive} ${disabled}" data-label="${label.name}" data-exists="${label.exists}" title="${tooltip}">${label.name}</button>`;
         }).join('');
         
-        container.appendChild(labelsContainer);
+        newContainer.appendChild(labelsContainer);
         
         // Add a "Show All" button when filtering by category
         if (this.activeFilters.category) {
@@ -393,13 +395,11 @@ class CascadeCatalog {
             showAllBtn.className = 'mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium';
             showAllBtn.innerHTML = '<i class="fas fa-times-circle mr-1"></i> Clear category filter';
             showAllBtn.addEventListener('click', () => this.clearCategoryFilter());
-            container.appendChild(showAllBtn);
+            newContainer.appendChild(showAllBtn);
         }
         
-        // Remove the "Other Labels" section to keep sidebar compact
-
-        // Add click handlers
-        container.addEventListener('click', (e) => {
+        // Add click handlers using event delegation (single listener)
+        newContainer.addEventListener('click', (e) => {
             if (e.target.classList.contains('label-filter')) {
                 const label = e.target.dataset.label;
                 const exists = e.target.dataset.exists === 'true';

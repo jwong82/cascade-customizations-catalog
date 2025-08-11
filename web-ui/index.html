@@ -8,8 +8,23 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .hero-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23ffffff" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
         }
         .card-hover {
             transition: all 0.3s ease;
@@ -68,6 +83,97 @@
             transform: translateY(-1px);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+        .filter-btn {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            transition: all 0.3s ease;
+        }
+        .filter-btn:hover {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .filter-btn.active {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border: 1px solid #334155;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .filter-btn.active:hover {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+        /* Search Input Styling */
+        .search-input {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            background: white;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        /* Stats Section */
+        .stats-section {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-top: 1px solid #cbd5e1;
+        }
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            min-width: 100px;
+        }
+        /* Sidebar Enhancements */
+        .sidebar-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-bottom: 1px solid #cbd5e1;
+        }
+        .category-filter {
+            background: white;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        .category-filter:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .category-filter.active {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            border-color: #334155;
+        }
+        /* Filter Toggle Button */
+        .filter-toggle {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        .filter-toggle:hover {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        /* Active Filters Section */
+        .active-filters-section {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 1px solid #93c5fd;
+        }
+        /* Clear Button Enhancement */
+        .clear-btn {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border: 1px solid #fca5a5;
+            color: #dc2626;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        .clear-btn:hover {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            transform: translateY(-1px);
+        }
         .modal {
             display: none;
         }
@@ -84,18 +190,35 @@
 </head>
 <body class="bg-gray-50">
     <!-- Header -->
-    <header class="gradient-bg text-white">
-        <div class="container mx-auto px-6 py-8">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-4xl font-bold mb-2">Cascade Customizations Catalog</h1>
-                    <p class="text-xl opacity-90">Community-driven rules and workflows for Windsurf Cascade</p>
-                </div>
-                <div class="text-right">
-                    <a href="https://github.com/Windsurf-Samples/cascade-customizations-catalog" class="inline-flex items-center bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-all">
-                        <i class="fab fa-github mr-2"></i>
-                        View on GitHub
-                    </a>
+    <header class="hero-bg text-white">
+        <div class="hero-content">
+            <div class="container mx-auto px-6 py-8">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-500 bg-opacity-20 rounded-xl mr-4">
+                            <i class="fas fa-cogs text-lg text-blue-300"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-4xl font-bold mb-1 tracking-tight">
+                                <span class="bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent">
+                                    Cascade
+                                </span>
+                                <span class="text-white">
+                                    Customizations Catalog
+                                </span>
+                            </h1>
+                            <p class="text-lg text-slate-300">
+                                Community-driven rules and workflows for Windsurf Cascade
+                            </p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <a href="https://github.com/Windsurf-Samples/cascade-customizations-catalog" 
+                           class="inline-flex items-center px-4 py-2 bg-white bg-opacity-10 hover:bg-opacity-20 border border-white border-opacity-20 hover:border-opacity-30 rounded-lg transition-all duration-300 backdrop-blur-sm">
+                            <i class="fab fa-github mr-2"></i>
+                            <span class="font-medium">View on GitHub</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -108,8 +231,8 @@
                 <!-- Search -->
                 <div class="flex-1 relative">
                     <input type="text" id="searchInput" placeholder="Search customizations..." 
-                           class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                           class="search-input w-full pl-10 pr-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
                 </div>
                 
                 <!-- Type Filter -->
@@ -126,9 +249,9 @@
                 </div>
                 
                 <!-- Filter Toggle -->
-                <button id="toggleFilters" class="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all">
+                <button id="toggleFilters" class="filter-toggle flex items-center gap-2 px-4 py-2 text-slate-600 hover:text-slate-800 rounded-lg">
                     <i class="fas fa-sliders-h"></i>
-                    <span>Filters</span>
+                    <span class="font-medium">Filters</span>
                     <i id="filterToggleIcon" class="fas fa-chevron-right text-sm transition-transform"></i>
                 </button>
             </div>
@@ -140,12 +263,12 @@
                         <i class="fas fa-filter mr-2 text-blue-500"></i>
                         Active filters:
                     </h3>
-                    <button id="clearAllFilters" class="text-xs text-red-600 hover:text-red-800 font-medium">
+                    <button id="clearAllFilters" class="clear-btn text-xs font-medium">
                         <i class="fas fa-times mr-1"></i>
                         Clear all
                     </button>
                 </div>
-                <div id="activeFilters" class="flex flex-wrap gap-1.5 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div id="activeFilters" class="active-filters-section flex flex-wrap gap-1.5 p-3 rounded-lg">
                     <!-- Active filters will be populated by JavaScript -->
                 </div>
             </div>
@@ -153,20 +276,29 @@
     </section>
 
     <!-- Stats -->
-    <section class="bg-gray-100 py-4">
+    <section class="stats-section py-6">
         <div class="container mx-auto px-6">
-            <div class="flex justify-center space-x-8 text-center">
-                <div>
-                    <div class="text-2xl font-bold text-blue-600" id="totalRules">0</div>
-                    <div class="text-sm text-gray-600">Rules</div>
+            <div class="flex justify-center space-x-6 text-center">
+                <div class="stat-card">
+                    <div class="flex items-center justify-center mb-2">
+                        <i class="fas fa-code text-blue-500 text-lg mr-2"></i>
+                        <div class="text-2xl font-bold text-slate-700" id="totalRules">0</div>
+                    </div>
+                    <div class="text-sm font-medium text-slate-500">Rules</div>
                 </div>
-                <div>
-                    <div class="text-2xl font-bold text-purple-600" id="totalWorkflows">0</div>
-                    <div class="text-sm text-gray-600">Workflows</div>
+                <div class="stat-card">
+                    <div class="flex items-center justify-center mb-2">
+                        <i class="fas fa-project-diagram text-purple-500 text-lg mr-2"></i>
+                        <div class="text-2xl font-bold text-slate-700" id="totalWorkflows">0</div>
+                    </div>
+                    <div class="text-sm font-medium text-slate-500">Workflows</div>
                 </div>
-                <div>
-                    <div class="text-2xl font-bold text-green-600" id="totalCustomizations">0</div>
-                    <div class="text-sm text-gray-600">Total</div>
+                <div class="stat-card">
+                    <div class="flex items-center justify-center mb-2">
+                        <i class="fas fa-layer-group text-emerald-500 text-lg mr-2"></i>
+                        <div class="text-2xl font-bold text-slate-700" id="totalCustomizations">0</div>
+                    </div>
+                    <div class="text-sm font-medium text-slate-500">Total</div>
                 </div>
             </div>
         </div>
@@ -176,12 +308,12 @@
     <div id="filterSidebar" class="fixed inset-y-0 left-0 z-40 w-80 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out">
         <div class="h-full flex flex-col">
             <!-- Sidebar Header -->
-            <div class="flex items-center justify-between p-4 border-b">
-                <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+            <div class="sidebar-header flex items-center justify-between p-4">
+                <h3 class="text-lg font-semibold text-slate-800 flex items-center">
                     <i class="fas fa-filter mr-2 text-blue-500"></i>
                     Filters
                 </h3>
-                <button id="closeSidebar" class="text-gray-500 hover:text-gray-700">
+                <button id="closeSidebar" class="text-slate-500 hover:text-slate-700 p-1 rounded-lg hover:bg-white transition-all">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
@@ -190,24 +322,24 @@
             <div class="flex-1 overflow-y-auto p-4">
                 <!-- Category Filters -->
                 <div class="mb-6">
-                    <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                        <i class="fas fa-layer-group mr-2 text-gray-500"></i>
+                    <h4 class="text-sm font-semibold text-slate-700 mb-3 flex items-center">
+                        <i class="fas fa-layer-group mr-2 text-slate-500"></i>
                         Categories
                     </h4>
                     <div class="space-y-2">
-                        <button class="category-filter w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all hover:bg-blue-50 hover:text-blue-700" data-category="Languages">
+                        <button class="category-filter w-full text-left px-3 py-2 rounded-lg text-sm font-medium" data-category="Languages">
                             <span class="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2"></span>
                             Languages
                         </button>
-                        <button class="category-filter w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all hover:bg-green-50 hover:text-green-700" data-category="Frameworks & Libraries">
+                        <button class="category-filter w-full text-left px-3 py-2 rounded-lg text-sm font-medium" data-category="Frameworks & Libraries">
                             <span class="inline-block w-3 h-3 rounded-full bg-green-500 mr-2"></span>
                             Frameworks & Libraries
                         </button>
-                        <button class="category-filter w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all hover:bg-purple-50 hover:text-purple-700" data-category="Technologies & Tools">
+                        <button class="category-filter w-full text-left px-3 py-2 rounded-lg text-sm font-medium" data-category="Technologies & Tools">
                             <span class="inline-block w-3 h-3 rounded-full bg-purple-500 mr-2"></span>
                             Technologies & Tools
                         </button>
-                        <button class="category-filter w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all hover:bg-amber-50 hover:text-amber-700" data-category="Development Areas">
+                        <button class="category-filter w-full text-left px-3 py-2 rounded-lg text-sm font-medium" data-category="Development Areas">
                             <span class="inline-block w-3 h-3 rounded-full bg-red-600 mr-2"></span>
                             Development Areas
                         </button>
@@ -217,8 +349,8 @@
 
                 <!-- Label Filters -->
                 <div>
-                    <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                        <i class="fas fa-tags mr-2 text-gray-500"></i>
+                    <h4 class="text-sm font-semibold text-slate-700 mb-3 flex items-center">
+                        <i class="fas fa-tags mr-2 text-slate-500"></i>
                         Tags
                     </h4>
                     <div id="labelFilters" class="flex flex-wrap gap-2">
