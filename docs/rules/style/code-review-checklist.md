@@ -1,7 +1,7 @@
 ---
 labels: code-review, quality-assurance, manual, checklist, best-practices, team-collaboration, documentation, intermediate
 author: Cascade Community
-modified: 2024-07-31
+modified: 2025-07-31
 ---
 
 # Code Review Checklist Rule
