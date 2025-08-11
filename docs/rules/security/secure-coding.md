@@ -102,3 +102,10 @@ app.use((error, req, res, next) => {
   });
 });
 ```
+
+<!-- METADATA
+labels: security, best-practices, always-on, authentication, authorization, encryption, input-validation, vulnerability-prevention, advanced
+author: Cascade Community
+activation: always-on
+category: Security
+-->

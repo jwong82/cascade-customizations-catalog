@@ -128,3 +128,10 @@ These principles apply whether you're working with:
 ---
 
 *This rule ensures that all code follows industry best practices, creating a foundation for high-quality, maintainable software development.*
+
+<!-- METADATA
+labels: best-practices, code-quality, always-on, universal, standards, beginner, intermediate, advanced
+author: Cascade Community
+activation: always-on
+category: Style
+-->

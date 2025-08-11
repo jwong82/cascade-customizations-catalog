@@ -198,20 +198,42 @@ class CascadeCatalog {
 
     /**
      * Extracts metadata from Jekyll-processed HTML content.
-     * Looks for Jekyll data attributes, comments, or structured content.
+     * Looks for HTML comment metadata blocks embedded in markdown files.
      */
     extractMetadataFromHTML(htmlContent) {
         const metadata = {};
         
-        // Try to find Jekyll data in HTML comments
-        const commentMatch = htmlContent.match(/<!--\s*JEKYLL_DATA:\s*({[^}]+})\s*-->/);
+        // Try to find METADATA comment block
+        const commentMatch = htmlContent.match(/<!--\s*METADATA\s*([\s\S]*?)\s*-->/);
         if (commentMatch) {
-            try {
-                const data = JSON.parse(commentMatch[1]);
-                return data;
-            } catch (e) {
-                console.warn('Failed to parse Jekyll data from HTML comment');
+            const metaText = commentMatch[1];
+            
+            // Parse labels
+            const labelMatch = metaText.match(/labels:\s*([^\n\r]+)/);
+            if (labelMatch) {
+                metadata.labels = labelMatch[1].split(',').map(l => l.trim());
             }
+            
+            // Parse author
+            const authorMatch = metaText.match(/author:\s*([^\n\r]+)/);
+            if (authorMatch) {
+                metadata.author = authorMatch[1].trim();
+            }
+            
+            // Parse activation
+            const activationMatch = metaText.match(/activation:\s*([^\n\r]+)/);
+            if (activationMatch) {
+                metadata.activation = activationMatch[1].trim();
+            }
+            
+            // Parse category
+            const categoryMatch = metaText.match(/category:\s*([^\n\r]+)/);
+            if (categoryMatch) {
+                metadata.category = categoryMatch[1].trim();
+            }
+            
+            console.log('Extracted metadata from HTML comment:', metadata);
+            return metadata;
         }
         
         // Try to extract from meta tags if Jekyll adds them
