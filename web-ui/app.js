@@ -325,8 +325,8 @@ class CascadeCatalog {
         const labelCategories = {
             'Languages': ['javascript', 'typescript', 'python', 'java', 'csharp', 'cpp', 'rust', 'go', 'php', 'ruby', 'swift', 'kotlin', 'dart'],
             'Frameworks & Libraries': ['react', 'vue', 'angular', 'svelte', 'nextjs', 'nuxtjs', 'express', 'fastapi', 'django', 'flask', 'spring', 'dotnet', 'laravel', 'rails'],
-            'Technologies & Tools': ['docker', 'kubernetes', 'git', 'github', 'gitlab', 'jenkins', 'circleci', 'github-actions', 'aws', 'azure', 'gcp', 'terraform', 'ansible', 'nginx', 'apache', 'redis', 'mongodb', 'postgresql', 'mysql', 'elasticsearch', 'rabbitmq', 'kafka', 'graphql', 'rest', 'grpc', 'webpack', 'vite', 'babel', 'eslint', 'prettier', 'jest', 'cypress', 'playwright', 'storybook', 'figma', 'postman', 'swagger', 'prometheus', 'grafana', 'sentry', 'datadog'],
-            'Development Areas': ['frontend', 'backend', 'fullstack', 'mobile', 'desktop', 'web', 'api', 'database', 'devops', 'cloud'],
+            'Security': ['security', 'authentication', 'authorization', 'encryption', 'vulnerability', 'secure-coding', 'input-validation', 'sql-injection', 'xss', 'csrf', 'https', 'oauth', 'jwt', 'penetration-testing', 'security-audit'],
+            'Style': ['code-style', 'formatting', 'naming-conventions', 'best-practices', 'code-review', 'linting', 'prettier', 'eslint', 'clean-code', 'refactoring', 'documentation', 'comments'],
             'Practices & Methodologies': ['testing', 'security', 'performance', 'accessibility', 'documentation', 'code-review', 'refactoring', 'debugging', 'monitoring', 'logging'],
             'Project Types': ['startup', 'enterprise', 'open-source', 'prototype', 'production', 'legacy'],
             'Workflow Types': ['setup', 'deployment', 'ci-cd', 'maintenance', 'migration', 'backup', 'monitoring'],
@@ -421,9 +421,9 @@ class CascadeCatalog {
                         return 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200';
                     case 'Frameworks & Libraries':
                         return 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200';
-                    case 'Technologies & Tools':
+                    case 'Security':
                         return 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200';
-                    case 'Development Areas':
+                    case 'Style':
                         return 'bg-red-100 text-red-800 border-red-200 hover:bg-red-200';
                     default:
                         return 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200';
@@ -474,7 +474,7 @@ class CascadeCatalog {
     }
     
     setCategoryFilter(category) {
-        // Set the active category filter
+        // Set the active category for navigation (not filtering)
         this.activeFilters.category = category;
         
         // Update visual state of category buttons
@@ -489,12 +489,12 @@ class CascadeCatalog {
         // Re-render the label filters to show only labels from this category
         this.renderLabelFilters();
         
-        // Update the active filters display
-        this.updateActiveFiltersDisplay();
+        // Note: We don't call updateActiveFiltersDisplay() or filterAndRender()
+        // because categories are for navigation, not filtering
     }
     
     clearCategoryFilter() {
-        // Clear the category filter
+        // Clear the category selection
         this.activeFilters.category = null;
         
         // Reset all category filter buttons
@@ -505,8 +505,8 @@ class CascadeCatalog {
         // Re-render the label filters to show all labels
         this.renderLabelFilters();
         
-        // Update the active filters display
-        this.updateActiveFiltersDisplay();
+        // Note: We don't call updateActiveFiltersDisplay() or filterAndRender()
+        // because categories are for navigation, not filtering
     }
     
     toggleSidebar() {
@@ -576,8 +576,8 @@ class CascadeCatalog {
         
         const hasActiveFilters = this.activeFilters.labels.size > 0 || 
                                 this.activeFilters.search || 
-                                this.activeFilters.type !== 'all' ||
-                                this.activeFilters.category !== null;
+                                this.activeFilters.type !== 'all';
+                                // Note: category is excluded since it's for navigation only
         
         if (hasActiveFilters) {
             activeFiltersSection.classList.remove('hidden');
@@ -589,43 +589,7 @@ class CascadeCatalog {
                 filterTags.push(`<span class="tag bg-indigo-100 text-indigo-800 border-indigo-200 cursor-pointer filter-tag" data-filter-type="type" data-filter-value="${this.activeFilters.type}">Type: ${this.activeFilters.type}</span>`);
             }
             
-            // Add category filter if present
-            if (this.activeFilters.category) {
-                // Get the color class based on the category
-                let colorClass = '';
-                switch(this.activeFilters.category) {
-                    case 'Languages':
-                        colorClass = 'bg-blue-100 text-blue-800 border-blue-200';
-                        break;
-                    case 'Frameworks & Libraries':
-                        colorClass = 'bg-green-100 text-green-800 border-green-200';
-                        break;
-                    case 'Technologies & Tools':
-                        colorClass = 'bg-purple-100 text-purple-800 border-purple-200';
-                        break;
-                    case 'Development Areas':
-                        colorClass = 'bg-orange-100 text-orange-800 border-orange-200';
-                        break;
-                    case 'Project Types':
-                        colorClass = 'bg-indigo-100 text-indigo-800 border-indigo-200';
-                        break;
-                    case 'Workflow Types':
-                        colorClass = 'bg-orange-100 text-orange-800 border-orange-200';
-                        break;
-                    case 'Rule Activation Types':
-                        colorClass = 'bg-teal-100 text-teal-800 border-teal-200';
-                        break;
-                    case 'Difficulty Levels':
-                        colorClass = 'bg-pink-100 text-pink-800 border-pink-200';
-                        break;
-                    case 'Team Roles':
-                        colorClass = 'bg-gray-100 text-gray-800 border-gray-200';
-                        break;
-                    default:
-                        colorClass = 'bg-gray-100 text-gray-800 border-gray-200';
-                }
-                filterTags.push(`<span class="tag ${colorClass} cursor-pointer filter-tag" data-filter-type="category" data-filter-value="${this.activeFilters.category}">Category: ${this.activeFilters.category}</span>`);
-            }
+            // Note: Category filters are not shown as active filters since they're for navigation only
             
             // Add search filter if present
             if (this.activeFilters.search) {
