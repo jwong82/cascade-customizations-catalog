@@ -1,7 +1,7 @@
 ---
 labels: best-practices, code-quality, always-on, universal, standards, beginner, intermediate, advanced
 author: Cascade Community
-modified: 2024-08-01
+modified: 2025-08-01
 ---
 # Universal Coding Best Practices Rule
 

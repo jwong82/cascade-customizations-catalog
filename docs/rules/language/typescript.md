@@ -1,7 +1,7 @@
 ---
 labels: typescript, javascript, type-safety, best-practices, code-quality, static-typing, glob-based, intermediate
 author: Cascade Community
-modified: 2024-07-31
+modified: 2025-07-31
 ---
 
 # TypeScript Best Practices Rule

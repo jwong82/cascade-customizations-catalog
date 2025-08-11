@@ -1,7 +1,7 @@
 ---
 labels: development-environment, setup, onboarding, tools, configuration, git, nodejs, vscode, beginner
 author: Cascade Community
-modified: 2024-08-01
+modified: 2025-08-01
 ---
 
 # Dev Environment Setup Workflow

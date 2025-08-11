@@ -1,7 +1,7 @@
 ---
 labels: nodejs, typescript, javascript, setup, project-setup, development-environment, testing, code-quality, eslint, prettier, beginner
 author: Cascade Community
-modified: 2024-07-31
+modified: 2025-07-31
 ---
 
 # Node.js Project Setup Workflow
