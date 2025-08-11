@@ -1,7 +1,7 @@
 ---
 labels: debugging, troubleshooting, problem-solving, maintenance, logging, profiling, systematic-approach, intermediate
 author: Cascade Community
-modified: 2024-08-01
+modified: 2025-08-01
 ---
 
 # Debugging Issues Workflow

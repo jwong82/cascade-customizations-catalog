@@ -1,7 +1,7 @@
 ---
 labels: security, best-practices, always-on, authentication, authorization, encryption, input-validation, vulnerability-prevention, advanced
 author: Cascade Community
-modified: 2024-07-31
+modified: 2025-07-31
 ---
 
 # Secure Coding Practices Rule

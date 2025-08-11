@@ -158,8 +158,14 @@
         }
         /* Active Filters Section */
         .active-filters-section {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            border: 1px solid #93c5fd;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+        }
+        .active-filters-header {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
         }
         /* Clear Button Enhancement */
         .clear-btn {
@@ -257,19 +263,21 @@
             </div>
             
             <!-- Active Filters Display -->
-            <div id="activeFiltersSection" class="mt-3 hidden">
-                <div class="flex items-center justify-between mb-2">
-                    <h3 class="text-sm font-semibold text-gray-700 flex items-center">
-                        <i class="fas fa-filter mr-2 text-blue-500"></i>
-                        Active filters:
-                    </h3>
-                    <button id="clearAllFilters" class="clear-btn text-xs font-medium">
-                        <i class="fas fa-times mr-1"></i>
-                        Clear all
-                    </button>
-                </div>
-                <div id="activeFilters" class="active-filters-section flex flex-wrap gap-1.5 p-3 rounded-lg">
-                    <!-- Active filters will be populated by JavaScript -->
+            <div id="activeFiltersSection" class="mt-4 hidden">
+                <div class="active-filters-header">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-semibold text-slate-700 flex items-center">
+                            <i class="fas fa-filter mr-2 text-slate-500"></i>
+                            Active filters:
+                        </h3>
+                        <button id="clearAllFilters" class="clear-btn text-xs font-medium">
+                            <i class="fas fa-times mr-1"></i>
+                            Clear all
+                        </button>
+                    </div>
+                    <div id="activeFilters" class="active-filters-section flex flex-wrap gap-1.5 p-3 rounded-lg">
+                        <!-- Active filters will be populated by JavaScript -->
+                    </div>
                 </div>
             </div>
         </div>

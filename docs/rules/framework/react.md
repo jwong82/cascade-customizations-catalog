@@ -1,7 +1,7 @@
 ---
 labels: react, javascript, typescript, frontend, hooks, functional-components, performance, jsx, model-decision, intermediate
 author: Cascade Community
-modified: 2024-07-31
+modified: 2025-07-31
 ---
 
 # React Best Practices Rule

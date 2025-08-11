@@ -58,7 +58,7 @@ class CascadeCatalog {
             `${basePath}/docs/rules/framework/react${fileExtension}`,
             `${basePath}/docs/rules/security/secure-coding${fileExtension}`,
             `${basePath}/docs/rules/style/code-review-checklist${fileExtension}`,
-            `${basePath}/docs/rules/general/coding-best-practices${fileExtension}`,
+            `${basePath}/docs/rules/style/coding-best-practices${fileExtension}`,
             
             // Workflows
             `${basePath}/docs/workflows/setup/node-project-setup${fileExtension}`,
@@ -70,7 +70,9 @@ class CascadeCatalog {
         
         for (const path of customizationPaths) {
             try {
-                const response = await fetch(path);
+                // Add cache-busting parameter to force fresh reload
+                const cacheBuster = `?v=${Date.now()}`;
+                const response = await fetch(path + cacheBuster);
                 if (response.ok) {
                     const content = await response.text();
                     const customization = this.parseCustomization(path, content);
@@ -898,7 +900,7 @@ class CascadeCatalog {
 
     async populateRawContent(customization) {
         try {
-            const response = await fetch(customization.windsurfPath);
+            const response = await fetch(customization.windsurfPath + `?v=${Date.now()}`);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const content = await response.text();
             const codeEl = document.getElementById('modalRawCode');

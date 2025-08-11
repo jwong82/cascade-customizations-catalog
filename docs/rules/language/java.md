@@ -2,7 +2,7 @@
 description: Comprehensive Java coding guidelines with focus on rule engine development and best practices
 labels: java, coding-standards, best-practices, rule-engine, intermediate, advanced, language
 author: Cascade Community
-modified: 2024-08-11
+modified: 2025-08-11
 activation: model-decision
 ---
 
