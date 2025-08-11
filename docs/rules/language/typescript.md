@@ -59,3 +59,10 @@ async function fetchUser(id: string): Promise<Result<User>> {
   }
 }
 ```
+
+<!-- METADATA
+labels: typescript, javascript, type-safety, best-practices, code-quality, static-typing, glob-based, intermediate
+author: Cascade Community
+activation: glob-based
+category: Languages
+-->

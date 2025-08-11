@@ -19,3 +19,10 @@ This rule activates when working with `.java` files and provides guidance for:
 - Implementing rule engine patterns (Strategy, Composite)
 - Following Java naming conventions and best practices
 - Building robust, testable rule systems
+
+<!-- METADATA
+labels: java, coding-standards, best-practices, rule-engine, intermediate, advanced, language
+author: Cascade Community
+activation: model-decision
+category: Languages
+-->

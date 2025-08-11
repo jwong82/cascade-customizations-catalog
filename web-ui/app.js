@@ -113,8 +113,13 @@ class CascadeCatalog {
             const descMatch = content.match(/<h2[^>]*>Description<\/h2>\s*<p>([\s\S]*?)<\/p>/);
             description = descMatch ? descMatch[1].trim().replace(/<[^>]*>/g, '') : '';
             
-            // Fallback label extraction since YAML frontmatter is stripped
-            metadata.labels = this.extractLabelsFromContent(content);
+            // Try to extract metadata from Jekyll's HTML comments or data attributes
+            metadata = this.extractMetadataFromHTML(content);
+            
+            // If no metadata found, use enhanced content-based extraction
+            if (!metadata.labels || metadata.labels.length === 0) {
+                metadata.labels = this.extractLabelsFromContent(content);
+            }
         } else {
             // Local development: Parse YAML frontmatter from raw markdown
             const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
@@ -192,26 +197,99 @@ class CascadeCatalog {
     }
 
     /**
-     * Extracts labels from HTML content using pattern matching.
+     * Extracts metadata from Jekyll-processed HTML content.
+     * Looks for HTML comment metadata blocks embedded in markdown files.
+     */
+    extractMetadataFromHTML(htmlContent) {
+        const metadata = {};
+        
+        // Try to find METADATA comment block
+        const commentMatch = htmlContent.match(/<!--\s*METADATA\s*([\s\S]*?)\s*-->/);
+        if (commentMatch) {
+            const metaText = commentMatch[1];
+            
+            // Parse labels
+            const labelMatch = metaText.match(/labels:\s*([^\n\r]+)/);
+            if (labelMatch) {
+                metadata.labels = labelMatch[1].split(',').map(l => l.trim());
+            }
+            
+            // Parse author
+            const authorMatch = metaText.match(/author:\s*([^\n\r]+)/);
+            if (authorMatch) {
+                metadata.author = authorMatch[1].trim();
+            }
+            
+            // Parse activation
+            const activationMatch = metaText.match(/activation:\s*([^\n\r]+)/);
+            if (activationMatch) {
+                metadata.activation = activationMatch[1].trim();
+            }
+            
+            // Parse category
+            const categoryMatch = metaText.match(/category:\s*([^\n\r]+)/);
+            if (categoryMatch) {
+                metadata.category = categoryMatch[1].trim();
+            }
+            
+            console.log('Extracted metadata from HTML comment:', metadata);
+            return metadata;
+        }
+        
+        // Try to extract from meta tags if Jekyll adds them
+        const metaLabels = htmlContent.match(/<meta name="labels" content="([^"]+)">/);
+        if (metaLabels) {
+            metadata.labels = metaLabels[1].split(',').map(l => l.trim());
+        }
+        
+        return metadata;
+    }
+    
+    /**
+     * Enhanced label extraction from HTML content using comprehensive pattern matching.
      * Fallback method for GitHub Pages where YAML frontmatter is unavailable.
-     * Uses content analysis to infer appropriate labels.
+     * Uses content analysis and path-based inference for accurate labeling.
      */
     extractLabelsFromContent(htmlContent) {
         const labels = [];
         const content = htmlContent.toLowerCase();
         
-        // Infer labels based on path and content
-        if (content.includes('typescript') || content.includes('ts')) labels.push('typescript');
-        if (content.includes('javascript') || content.includes('js')) labels.push('javascript');
-        if (content.includes('react')) labels.push('react');
-        if (content.includes('security') || content.includes('secure')) labels.push('security');
-        if (content.includes('best practices') || content.includes('coding')) labels.push('best-practices');
-        if (content.includes('workflow') || content.includes('setup')) labels.push('workflow');
-        if (content.includes('debugging') || content.includes('maintenance')) labels.push('debugging');
-        if (content.includes('node') || content.includes('npm')) labels.push('nodejs');
-        if (content.includes('development') || content.includes('dev')) labels.push('development');
+        // Language detection (more comprehensive)
+        if (content.includes('typescript') || content.includes('ts') || content.includes('.ts') || content.includes('.tsx')) labels.push('typescript');
+        if (content.includes('javascript') || content.includes('js') || content.includes('.js') || content.includes('.jsx')) labels.push('javascript');
+        if ((content.includes('java') && !content.includes('javascript')) || content.includes('.java') || content.includes('jvm')) labels.push('java');
+        if (content.includes('python') || content.includes('.py') || content.includes('django') || content.includes('flask')) labels.push('python');
+        if (content.includes('react') || content.includes('jsx') || content.includes('hooks')) labels.push('react');
+        if (content.includes('vue') || content.includes('vuejs')) labels.push('vue');
+        if (content.includes('angular') || content.includes('ng-')) labels.push('angular');
         
-        return labels;
+        // Framework and library detection
+        if (content.includes('spring') || content.includes('springframework')) labels.push('spring');
+        if (content.includes('express') || content.includes('expressjs')) labels.push('express');
+        if (content.includes('nextjs') || content.includes('next.js')) labels.push('nextjs');
+        
+        // Practice and methodology detection
+        if (content.includes('security') || content.includes('secure') || content.includes('authentication') || content.includes('authorization')) labels.push('security');
+        if (content.includes('best practices') || content.includes('coding standards') || content.includes('code quality')) labels.push('best-practices');
+        if (content.includes('testing') || content.includes('unit test') || content.includes('integration test')) labels.push('testing');
+        if (content.includes('performance') || content.includes('optimization')) labels.push('performance');
+        
+        // Workflow and setup detection
+        if (content.includes('workflow') || content.includes('setup') || content.includes('installation')) labels.push('workflow');
+        if (content.includes('debugging') || content.includes('troubleshooting') || content.includes('maintenance')) labels.push('debugging');
+        if (content.includes('node') || content.includes('npm') || content.includes('nodejs')) labels.push('nodejs');
+        if (content.includes('development') || content.includes('dev environment') || content.includes('dev setup')) labels.push('development');
+        
+        // Skill level detection
+        if (content.includes('beginner') || content.includes('basic') || content.includes('introduction')) labels.push('beginner');
+        if (content.includes('intermediate') || content.includes('moderate')) labels.push('intermediate');
+        if (content.includes('advanced') || content.includes('expert') || content.includes('complex')) labels.push('advanced');
+        
+        // Rule engine specific (for Java rule)
+        if (content.includes('rule engine') || content.includes('business rules') || content.includes('rule-based')) labels.push('rule-engine');
+        if (content.includes('coding standards') || content.includes('style guide')) labels.push('coding-standards');
+        
+        return [...new Set(labels)]; // Remove duplicates
     }
 
     setupEventListeners() {
@@ -325,8 +403,8 @@ class CascadeCatalog {
         const labelCategories = {
             'Languages': ['javascript', 'typescript', 'python', 'java', 'csharp', 'cpp', 'rust', 'go', 'php', 'ruby', 'swift', 'kotlin', 'dart'],
             'Frameworks & Libraries': ['react', 'vue', 'angular', 'svelte', 'nextjs', 'nuxtjs', 'express', 'fastapi', 'django', 'flask', 'spring', 'dotnet', 'laravel', 'rails'],
-            'Technologies & Tools': ['docker', 'kubernetes', 'git', 'github', 'gitlab', 'jenkins', 'circleci', 'github-actions', 'aws', 'azure', 'gcp', 'terraform', 'ansible', 'nginx', 'apache', 'redis', 'mongodb', 'postgresql', 'mysql', 'elasticsearch', 'rabbitmq', 'kafka', 'graphql', 'rest', 'grpc', 'webpack', 'vite', 'babel', 'eslint', 'prettier', 'jest', 'cypress', 'playwright', 'storybook', 'figma', 'postman', 'swagger', 'prometheus', 'grafana', 'sentry', 'datadog'],
-            'Development Areas': ['frontend', 'backend', 'fullstack', 'mobile', 'desktop', 'web', 'api', 'database', 'devops', 'cloud'],
+            'Security': ['security', 'authentication', 'authorization', 'encryption', 'vulnerability', 'secure-coding', 'input-validation', 'sql-injection', 'xss', 'csrf', 'https', 'oauth', 'jwt', 'penetration-testing', 'security-audit'],
+            'Style': ['code-style', 'formatting', 'naming-conventions', 'best-practices', 'code-review', 'linting', 'prettier', 'eslint', 'clean-code', 'refactoring', 'documentation', 'comments'],
             'Practices & Methodologies': ['testing', 'security', 'performance', 'accessibility', 'documentation', 'code-review', 'refactoring', 'debugging', 'monitoring', 'logging'],
             'Project Types': ['startup', 'enterprise', 'open-source', 'prototype', 'production', 'legacy'],
             'Workflow Types': ['setup', 'deployment', 'ci-cd', 'maintenance', 'migration', 'backup', 'monitoring'],
@@ -421,9 +499,9 @@ class CascadeCatalog {
                         return 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200';
                     case 'Frameworks & Libraries':
                         return 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200';
-                    case 'Technologies & Tools':
+                    case 'Security':
                         return 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200';
-                    case 'Development Areas':
+                    case 'Style':
                         return 'bg-red-100 text-red-800 border-red-200 hover:bg-red-200';
                     default:
                         return 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200';
@@ -474,7 +552,7 @@ class CascadeCatalog {
     }
     
     setCategoryFilter(category) {
-        // Set the active category filter
+        // Set the active category for navigation (not filtering)
         this.activeFilters.category = category;
         
         // Update visual state of category buttons
@@ -489,12 +567,12 @@ class CascadeCatalog {
         // Re-render the label filters to show only labels from this category
         this.renderLabelFilters();
         
-        // Update the active filters display
-        this.updateActiveFiltersDisplay();
+        // Note: We don't call updateActiveFiltersDisplay() or filterAndRender()
+        // because categories are for navigation, not filtering
     }
     
     clearCategoryFilter() {
-        // Clear the category filter
+        // Clear the category selection
         this.activeFilters.category = null;
         
         // Reset all category filter buttons
@@ -505,8 +583,8 @@ class CascadeCatalog {
         // Re-render the label filters to show all labels
         this.renderLabelFilters();
         
-        // Update the active filters display
-        this.updateActiveFiltersDisplay();
+        // Note: We don't call updateActiveFiltersDisplay() or filterAndRender()
+        // because categories are for navigation, not filtering
     }
     
     toggleSidebar() {
@@ -576,8 +654,8 @@ class CascadeCatalog {
         
         const hasActiveFilters = this.activeFilters.labels.size > 0 || 
                                 this.activeFilters.search || 
-                                this.activeFilters.type !== 'all' ||
-                                this.activeFilters.category !== null;
+                                this.activeFilters.type !== 'all';
+                                // Note: category is excluded since it's for navigation only
         
         if (hasActiveFilters) {
             activeFiltersSection.classList.remove('hidden');
@@ -589,43 +667,7 @@ class CascadeCatalog {
                 filterTags.push(`<span class="tag bg-indigo-100 text-indigo-800 border-indigo-200 cursor-pointer filter-tag" data-filter-type="type" data-filter-value="${this.activeFilters.type}">Type: ${this.activeFilters.type}</span>`);
             }
             
-            // Add category filter if present
-            if (this.activeFilters.category) {
-                // Get the color class based on the category
-                let colorClass = '';
-                switch(this.activeFilters.category) {
-                    case 'Languages':
-                        colorClass = 'bg-blue-100 text-blue-800 border-blue-200';
-                        break;
-                    case 'Frameworks & Libraries':
-                        colorClass = 'bg-green-100 text-green-800 border-green-200';
-                        break;
-                    case 'Technologies & Tools':
-                        colorClass = 'bg-purple-100 text-purple-800 border-purple-200';
-                        break;
-                    case 'Development Areas':
-                        colorClass = 'bg-orange-100 text-orange-800 border-orange-200';
-                        break;
-                    case 'Project Types':
-                        colorClass = 'bg-indigo-100 text-indigo-800 border-indigo-200';
-                        break;
-                    case 'Workflow Types':
-                        colorClass = 'bg-orange-100 text-orange-800 border-orange-200';
-                        break;
-                    case 'Rule Activation Types':
-                        colorClass = 'bg-teal-100 text-teal-800 border-teal-200';
-                        break;
-                    case 'Difficulty Levels':
-                        colorClass = 'bg-pink-100 text-pink-800 border-pink-200';
-                        break;
-                    case 'Team Roles':
-                        colorClass = 'bg-gray-100 text-gray-800 border-gray-200';
-                        break;
-                    default:
-                        colorClass = 'bg-gray-100 text-gray-800 border-gray-200';
-                }
-                filterTags.push(`<span class="tag ${colorClass} cursor-pointer filter-tag" data-filter-type="category" data-filter-value="${this.activeFilters.category}">Category: ${this.activeFilters.category}</span>`);
-            }
+            // Note: Category filters are not shown as active filters since they're for navigation only
             
             // Add search filter if present
             if (this.activeFilters.search) {

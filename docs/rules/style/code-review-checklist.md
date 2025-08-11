@@ -61,3 +61,10 @@ database query to prevent SQL injection."
 5. **Security**: Look for potential security issues
 6. **Performance**: Consider the performance impact
 7. **Feedback**: Provide constructive, specific feedback
+
+<!-- METADATA
+labels: code-review, quality-assurance, manual, checklist, best-practices, team-collaboration, documentation, intermediate
+author: Cascade Community
+activation: manual
+category: Style
+-->

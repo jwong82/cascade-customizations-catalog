@@ -267,3 +267,10 @@ curl -v http://backend-2:3000/health
 ```
 
 This systematic approach ensures thorough investigation and helps build institutional knowledge for future debugging efforts.
+
+<!-- METADATA
+labels: debugging, troubleshooting, problem-solving, maintenance, logging, profiling, systematic-approach, intermediate
+author: Cascade Community
+activation: manual
+category: Workflows
+-->

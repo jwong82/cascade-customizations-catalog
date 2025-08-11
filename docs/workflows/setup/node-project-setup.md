@@ -139,3 +139,10 @@ PORT=3000
 DATABASE_URL=postgresql://localhost:5432/myapp
 JWT_SECRET=super_secret_key_123
 ```
+
+<!-- METADATA
+labels: nodejs, typescript, javascript, setup, project-setup, development-environment, testing, code-quality, eslint, prettier, beginner
+author: Cascade Community
+activation: manual
+category: Workflows
+-->
