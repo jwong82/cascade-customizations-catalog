@@ -1,4 +1,4 @@
-import { CascadeCatalog } from './core/CascadeCatalog.js?v=20250812-fixed';
+import { CascadeCatalog } from './core/CascadeCatalog.js?v=20250812-ghfix';
 
 /**
  * Main application entry point

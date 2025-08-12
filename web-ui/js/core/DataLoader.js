@@ -23,6 +23,25 @@ export class DataLoader {
         }
     }
     
+    /**
+     * Returns owner and repo inferred from current URL when on GitHub Pages
+     */
+    getRepoInfo() {
+        const pathParts = window.location.pathname.split('/').filter(part => part);
+        const repoName = pathParts[0] || 'cascade-customizations-catalog';
+        const owner = (window.location.hostname.split('.')[0] || 'Windsurf-Samples');
+        return { owner, repoName };
+    }
+    
+    /**
+     * Builds a raw.githubusercontent.com URL for a repository-relative path
+     */
+    getRawGitHubUrl(relPath) {
+        const { owner, repoName } = this.getRepoInfo();
+        const branch = 'main';
+        return `https://raw.githubusercontent.com/${owner}/${repoName}/${branch}/${relPath}`;
+    }
+    
     async loadCustomizations() {
         const customizations = [];
         
@@ -115,8 +134,13 @@ export class DataLoader {
     }
     
     async loadSingleCustomization(link, type, subdir) {
-        const filePath = `${this.basePath}/docs/${type}/${subdir}/${link.filename}`;
-        const windsurfPath = filePath.replace(this.fileExtension, '.md');
+        const baseName = link.filename.replace(/\.md$/i, '');
+        // Display path: .html on GitHub Pages, .md locally
+        const filePath = `${this.basePath}/docs/${type}/${subdir}/${baseName}${this.fileExtension}`;
+        // Source path for download/copy: use raw.githubusercontent.com on GH Pages
+        const windsurfPath = this.isGitHubPages
+            ? this.getRawGitHubUrl(`docs/${type}/${subdir}/${baseName}.md`)
+            : `${this.basePath}/docs/${type}/${subdir}/${baseName}.md`;
         
         try {
             const response = await fetch(filePath);
@@ -149,7 +173,7 @@ export class DataLoader {
                 labels: metadata.labels || [],
                 author: metadata.author || 'Unknown',
                 activation: metadata.activation || 'manual',
-                filename: link.filename,
+                filename: `${baseName}.md`,
                 path: filePath,
                 windsurfPath: windsurfPath,
                 modified: DateUtils.formatDate(metadata.modified || new Date().toISOString())
