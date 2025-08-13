@@ -123,8 +123,13 @@ export class ModalManager {
             // Remove HTML comments for display
             content = content.replace(/<!--[\s\S]*?-->/g, '');
             
-            // Convert markdown to HTML (basic conversion)
-            const htmlContent = this.markdownToHtml(content);
+            // Convert markdown to HTML (prefer Marked if available for proper semantics)
+            let htmlContent;
+            if (window.marked && typeof window.marked.parse === 'function') {
+                htmlContent = window.marked.parse(content);
+            } else {
+                htmlContent = this.markdownToHtml(content);
+            }
             contentContainer.innerHTML = htmlContent;
             
             // Apply syntax highlighting if Prism is available
