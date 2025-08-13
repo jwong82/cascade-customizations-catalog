@@ -18,16 +18,11 @@ export class FilterManager {
     initializeFilters(customizations) {
         // Collect all unique labels
         this.allLabels.clear();
-        this.labelsByCategory = {};
+        this.labelsByCategory = {}; // Will be populated from static mapping in renderLabelFilters
         
         customizations.forEach(customization => {
             customization.labels.forEach(label => {
                 this.allLabels.add(label);
-                
-                if (!this.labelsByCategory[customization.category]) {
-                    this.labelsByCategory[customization.category] = new Set();
-                }
-                this.labelsByCategory[customization.category].add(label);
             });
         });
     }
@@ -150,28 +145,46 @@ export class FilterManager {
         const newContainer = container.cloneNode(false);
         container.parentNode.replaceChild(newContainer, container);
         
-        // Determine which labels to show based on category selection
-        let labelsToShow;
-        if (this.activeFilters.category && this.labelsByCategory[this.activeFilters.category]) {
-            // Show only labels from the selected category
-            labelsToShow = Array.from(this.labelsByCategory[this.activeFilters.category]);
-        } else {
-            // Show all labels when no category is selected
-            labelsToShow = Array.from(this.allLabels);
-        }
+        // Fixed label categories mapping (restored from pre-refactor)
+        const labelCategories = {
+            'Languages': ['javascript', 'typescript', 'python', 'java', 'csharp', 'cpp', 'rust', 'go', 'php', 'ruby', 'swift', 'kotlin', 'dart'],
+            'Frameworks & Libraries': ['react', 'vue', 'angular', 'svelte', 'nextjs', 'nuxtjs', 'express', 'fastapi', 'django', 'flask', 'spring', 'dotnet', 'laravel', 'rails'],
+            'Security': ['security', 'authentication', 'authorization', 'encryption', 'vulnerability', 'secure-coding', 'input-validation', 'sql-injection', 'xss', 'csrf', 'https', 'oauth', 'jwt', 'penetration-testing', 'security-audit'],
+            'Style': ['code-style', 'formatting', 'naming-conventions', 'best-practices', 'code-review', 'linting', 'prettier', 'eslint', 'clean-code', 'refactoring', 'documentation', 'comments']
+        };
         
-        // Sort labels alphabetically
-        const sortedLabels = labelsToShow.sort();
+        // Build labelsByCategory and collect all labels with metadata
+        this.labelsByCategory = {};
+        const allLabels = [];
+        Object.entries(labelCategories).forEach(([category, labels]) => {
+            this.labelsByCategory[category] = labels;
+            labels.forEach(name => {
+                allLabels.push({
+                    name,
+                    category,
+                    exists: this.allLabels.has(name)
+                });
+            });
+        });
         
-        const labelButtons = sortedLabels.map(label => {
-            const isActive = this.activeFilters.labels.has(label);
-            const colorClass = ColorUtils.getLabelColorClass(label);
+        // Filter labels by selected category
+        const filtered = this.activeFilters.category
+            ? allLabels.filter(l => l.category === this.activeFilters.category)
+            : allLabels;
+        
+        // Sort alphabetically
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        
+        const labelButtons = filtered.map(l => {
+            const isActive = this.activeFilters.labels.has(l.name);
+            // Use uniform category color when a category is selected, otherwise still use category color by label grouping
+            const colorClass = ColorUtils.getCategoryColorClass(l.category);
             const activeClass = isActive ? 'active' : '';
+            const tooltip = l.exists ? `${l.category}` : `${l.category} (No matching items yet)`;
             
             return `
-                <button class="label-filter ${colorClass} ${activeClass} px-3 py-1.5 rounded-full text-sm font-medium border cursor-pointer transition-all duration-200"
-                        data-label="${label}">
-                    ${label}
+                <button class="tag label-filter ${colorClass} ${activeClass} px-3 py-1.5 rounded-full text-sm font-medium border cursor-pointer transition-all duration-200" data-label="${l.name}" title="${tooltip}">
+                    ${l.name}
                 </button>
             `;
         }).join('');
@@ -213,7 +226,12 @@ export class FilterManager {
 
             // Add label filters
             Array.from(this.activeFilters.labels).forEach(label => {
-                const colorClass = ColorUtils.getLabelColorClass(label);
+                // Prefer category-based color if available
+                let categoryForLabel = null;
+                for (const [cat, labels] of Object.entries(this.labelsByCategory)) {
+                    if (Array.isArray(labels) && labels.includes(label)) { categoryForLabel = cat; break; }
+                }
+                const colorClass = ColorUtils.getCategoryColorClass(categoryForLabel || this.activeFilters.category || '');
                 filterTags.push(`<span class="tag ${colorClass} cursor-pointer filter-tag" data-filter-type="label" data-filter-value="${label}">${label}</span>`);
             });
             
