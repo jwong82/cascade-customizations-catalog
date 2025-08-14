@@ -187,7 +187,6 @@ body:
         - developer
         - team-lead
         - architect
-        - devops
         - qa
         - designer
     validations:
