@@ -231,7 +231,7 @@ body:
     attributes:
       label: Conditional activation (Rules only)
       description: If Rule, specify activation mode and any description/glob. Examples: `model-decision`, `glob-based` with pattern(s) like `src/**/*.ts`
-      placeholder: e.g., model-decision (when editing .java files) OR glob-based: src/**/*.ts
+      placeholder: 'e.g., model-decision (when editing .java files) OR glob-based: src/**/*.ts'
     validations:
       required: false
 
@@ -240,7 +240,7 @@ body:
     attributes:
       label: Customization content
       description: Paste the full content of the Rule or Workflow (Markdown). Include YAML frontmatter if applicable.
-      placeholder: """
+      placeholder: |
         ---
         description: ...
         labels: ...
@@ -249,7 +249,6 @@ body:
         ---
         # Title
         Details...
-        """
     validations:
       required: false
 
