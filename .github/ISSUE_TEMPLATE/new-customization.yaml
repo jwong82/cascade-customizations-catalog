@@ -1,54 +1,36 @@
-name: Catalog Customization Proposal
-description: Suggest a new Rule or Workflow for the Windsurf community catalog.
-title: "[Catalog]: "
-labels: ["catalog-submission", "triage"]
-assignees:
-  - ""
+name: Customization Proposal
+description: Suggest a new Rule or Workflow for the Cascade Customizations Catalog
+title: "[Customization Proposal]: <short title>"
+labels:
+  - triage
+  - proposal
+assignees: []
 body:
-  # =========================
-  # Intro / Guidance
-  # =========================
   - type: markdown
     attributes:
       value: |
-        Thanks for proposing a new customization!  
-        Please fill in all **Required** sections so we can review quickly.
+        Thank you for proposing a new Cascade customization! Please provide the required information below.
+        
+        Notes:
+        - The Category + (Rule) Subcategory determines where this will live in the repo.
+        - See the full label list here: https://github.com/Windsurf-Samples/cascade-customizations-catalog/blob/main/docs/labels.md
 
-        **Tags reference:** See the labels guide here: https://github.com/Windsurf-Samples/cascade-customizations-catalog/blob/main/docs/labels.md
-
-        **Categories:**  
-        - **Category**: `rule` or `workflow`  
-        - **Rule subcategories**: `framework`, `general`, `language`, `security`, `style`  
-        - **Workflows**: no subcategories (use `N/A`)
-
-  # =========================
   # Required Docs
-  # =========================
   - type: input
-    id: title_of_customization
+    id: customization_title
     attributes:
       label: Title of customization
-      placeholder: e.g., "Java Coding Guidelines"
+      description: Short, clear title for your rule or workflow
+      placeholder: e.g., "Java Style Guidelines"
     validations:
       required: true
 
   - type: textarea
-    id: description
+    id: customization_description
     attributes:
       label: Description of customization
-      description: What does this customization do and why is it valuable?
-      placeholder: One-to-three sentence summary of the purpose, scope, and benefits.
-    validations:
-      required: true
-
-  - type: textarea
-    id: applicable_tags
-    attributes:
-      label: Applicable tags
-      description: |
-        List the catalog tags/labels that apply (comma-separated).  
-        Use the reference above to choose valid tags.
-      placeholder: e.g., java, coding-standards, best-practices, language
+      description: What does this customization do and why is it useful?
+      placeholder: Provide a concise overview of the customization
     validations:
       required: true
 
@@ -56,135 +38,215 @@ body:
     id: category
     attributes:
       label: Category
-      description: Select whether this is a Rule or Workflow.
+      description: Select whether this is a Rule or a Workflow
       options:
-        - rule
-        - workflow
+        - Rule
+        - Workflow
     validations:
       required: true
 
   - type: dropdown
-    id: subcategory
+    id: rule_subcategory
     attributes:
-      label: Subcategory (rules only)
-      description: If Category is "rule", select a subcategory. Otherwise select "N/A".
+      label: Rule Subcategory (only if Category = Rule)
+      description: For rules, choose the subcategory. Not required for workflows.
       options:
         - framework
         - general
         - language
         - security
         - style
-        - N/A
-      default: 5
     validations:
-      required: true
+      required: false
 
-  - type: input
-    id: directory_prefix
-    attributes:
-      label: Proposed directory location (relative to repo root)
-      description: |
-        Where should this live under `.windsurf/rules` or `.windsurf/workflows`?
-        Example (rule): `.windsurf/rules/language/java-coding-guidelines.yml`  
-        Example (workflow): `.windsurf/workflows/auto-assign-reviewers.yml`
-      placeholder: e.g., .windsurf/rules/language/java-coding-guidelines.yml
-    validations:
-      required: true
-
-  # =========================
-  # Customization Itself
-  # =========================
   - type: dropdown
-    id: has_example_link
+    id: labels
     attributes:
-      label: Do you have an example rule/workflow you can link to?
+      label: Applicable tags (labels)
+      description: "Choose all applicable labels. See the full list and guidance: https://github.com/Windsurf-Samples/cascade-customizations-catalog/blob/main/docs/labels.md"
+      multiple: true
       options:
-        - "Yes"
-        - "No"
+        # Languages
+        - javascript
+        - typescript
+        - python
+        - java
+        - csharp
+        - cpp
+        - rust
+        - go
+        - php
+        - ruby
+        - swift
+        - kotlin
+        - dart
+        # Frameworks & Libraries
+        - react
+        - vue
+        - angular
+        - svelte
+        - nextjs
+        - nuxtjs
+        - express
+        - fastapi
+        - django
+        - flask
+        - spring
+        - dotnet
+        - laravel
+        - rails
+        # Technologies & Tools
+        - docker
+        - kubernetes
+        - git
+        - github
+        - gitlab
+        - jenkins
+        - circleci
+        - github-actions
+        - aws
+        - azure
+        - gcp
+        - terraform
+        - ansible
+        - nginx
+        - apache
+        - redis
+        - mongodb
+        - postgresql
+        - mysql
+        - elasticsearch
+        - rabbitmq
+        - kafka
+        - graphql
+        - rest
+        - grpc
+        - webpack
+        - vite
+        - babel
+        - eslint
+        - prettier
+        - jest
+        - cypress
+        - playwright
+        - storybook
+        - figma
+        - postman
+        - swagger
+        - prometheus
+        - grafana
+        - sentry
+        - datadog
+        # Development Areas
+        - frontend
+        - backend
+        - fullstack
+        - mobile
+        - desktop
+        - web
+        - api
+        - database
+        - devops
+        - cloud
+        # Practices & Methodologies
+        - testing
+        - security
+        - performance
+        - accessibility
+        - documentation
+        - code-review
+        - refactoring
+        - debugging
+        - monitoring
+        - logging
+        # Project Types
+        - startup
+        - enterprise
+        - open-source
+        - prototype
+        - production
+        - legacy
+        # Workflow Types
+        - setup
+        - deployment
+        - ci-cd
+        - maintenance
+        - migration
+        - backup
+        # Rule Activation Types
+        - always-on
+        - model-decision
+        - glob-based
+        - manual
+        # Difficulty Levels
+        - beginner
+        - intermediate
+        - advanced
+        - expert
+        # Team Roles
+        - developer
+        - team-lead
+        - architect
+        - qa
+        - designer
     validations:
       required: true
 
+  - type: markdown
+    attributes:
+      value: |
+        Location mapping:
+        - Rules will live under `.windsurf/rules/<subcategory>/`
+        - Workflows will live under `.windsurf/workflows/`
+
+  # Example or Full Details
   - type: input
     id: example_link
     attributes:
-      label: Link to example in an open-source repo
-      description: Provide a public URL to the rule/workflow if available.
-      placeholder: e.g., https://github.com/owner/repo/path/to/file.yml
+      label: Example link (optional)
+      description: Link to an existing example rule/workflow in an open-source repo
+      placeholder: https://github.com/<owner>/<repo>/path/to/example
     validations:
-      required: true
-    if:
-      field: has_example_link
-      equals: "Yes"
+      required: false
 
-  # --- Branch for "No" (collect full spec) ---
-  - type: dropdown
-    id: type_explicit
+  - type: markdown
     attributes:
-      label: Type
-      description: Select the customization type.
-      options:
-        - Rule
-        - Workflow
-    validations:
-      required: true
-    if:
-      field: has_example_link
-      equals: "No"
-
-  - type: dropdown
-    id: rule_has_conditional
-    attributes:
-      label: (Rule only) Conditional activation?
-      description: If this is a Rule, does it activate conditionally?
-      options:
-        - "No"
-        - "Yes"
-        - "N/A (Workflow)"
-      default: 0
-    validations:
-      required: true
-    if:
-      field: has_example_link
-      equals: "No"
+      value: |
+        If you do NOT have an example to link, please fill out the details below.
 
   - type: input
-    id: conditional_description
+    id: activation_mode
     attributes:
-      label: Conditional activation description / glob
-      description: Provide the condition/glob (e.g., "activates when editing *.java files").
-      placeholder: e.g., Files matching **/*.java or paths under /rules/engine/**
+      label: Conditional activation (Rules only)
+      description: "If Rule, specify activation mode and any description/glob. Examples: `model-decision`, `glob-based` with pattern(s) like `src/**/*.ts`"
+      placeholder: 'e.g., model-decision (when editing .java files) OR glob-based: src/**/*.ts'
     validations:
-      required: true
-    if:
-      field: rule_has_conditional
-      equals: "Yes"
+      required: false
 
   - type: textarea
     id: customization_content
     attributes:
-      label: Customization content (rule or workflow)
-      description: Paste the full YAML (or JSON) content of the rule/workflow here.
+      label: Customization content
+      description: Paste the full content of the Rule or Workflow if link not provided.
       placeholder: |
-        name: Java Coding Guidelines
-        # ... full content ...
-      render: yaml
+        ---
+        description: ...
+        labels: ...
+        author: ...
+        activation: ...
+        ---
+        # Title
+        Customization content...
     validations:
-      required: true
-    if:
-      field: has_example_link
-      equals: "No"
+      required: false
 
-  # =========================
   # Optional Docs
-  # =========================
   - type: textarea
     id: usage_instructions
     attributes:
       label: Usage instructions (optional)
-      description: Installation/enablement steps. Include any prerequisites or config flags.
-      placeholder: |
-        1. Copy file to .windsurf/rules/language/java-coding-guidelines.yml
-        2. Commit and push. The rule activates on .java files...
+      description: Any setup or usage steps users should follow
+      placeholder: Step-by-step instructions
     validations:
       required: false
 
@@ -192,37 +254,18 @@ body:
     id: usage_examples
     attributes:
       label: Usage examples (optional)
-      description: Provide example snippets and/or paste image/GIF URLs. You can also drag-and-drop images after submitting.
-      placeholder: |
-        Example before/after code:
-        ```java
-        // before ...
-        // after ...
-        ```
-        Screenshot/GIF URLs:
-        - https://...
+      description: Add links or drag-and-drop GIFs/images demonstrating the customization
+      placeholder: Links or descriptions of screenshots/GIFs
     validations:
       required: false
 
-  # =========================
-  # Submitter Contact
-  # =========================
-  - type: input
-    id: contact
-    attributes:
-      label: Contact (optional)
-      description: How can we reach you for follow-ups (email or GitHub handle)?
-      placeholder: @your-handle or you@example.com
-    validations:
-      required: false
-
-  # =========================
-  # Confirmation
-  # =========================
   - type: checkboxes
-    id: confirm
+    id: terms
     attributes:
-      label: Confirmation
+      label: Terms and checks
+      description: Please confirm the following
       options:
-        - label: I confirm this submission follows the Code of Conduct and includes all required information.
+        - label: I confirm this contribution can be shared under the repository's license
+          required: true
+        - label: I agree to follow the project's Code of Conduct
           required: true
