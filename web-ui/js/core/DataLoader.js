@@ -185,21 +185,54 @@ export class DataLoader {
     }
     
     extractDescription(content) {
-        // Remove YAML frontmatter
+        const truncate = (text) => {
+            const normalized = (text || '').replace(/\s+/g, ' ').trim();
+            if (!normalized) return 'No description available';
+            return normalized.length > 200 ? normalized.slice(0, 200) + '...' : normalized;
+        };
+        const stripHTML = (html) => {
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            return (div.textContent || div.innerText || '').trim();
+        };
+
+        if (this.isGitHubPages) {
+            // Prefer the explicit Description section in Jekyll-rendered HTML
+            const sectionMatch = content.match(/<h2[^>]*>\s*Description\s*<\/h2>\s*([\s\S]*?)(?=<h[1-6][^>]*>|$)/i);
+            if (sectionMatch) {
+                const pMatch = sectionMatch[1].match(/<p[^>]*>([\s\S]*?)<\/p>/i);
+                if (pMatch) return truncate(stripHTML(pMatch[1]));
+                return truncate(stripHTML(sectionMatch[1]));
+            }
+            // Fallback: first paragraph in the HTML content
+            const firstP = content.match(/<p[^>]*>([\s\S]*?)<\/p>/i);
+            if (firstP) return truncate(stripHTML(firstP[1]));
+            // Final fallback: strip tags and take first non-empty line
+            const plain = stripHTML(content);
+            const firstLine = plain.split('\n').map(l => l.trim()).find(l => l);
+            return truncate(firstLine || '');
+        }
+
+        // Local development: prefer Markdown "## Description" section
+        const mdSection = content.match(/##\s*Description\s*\n+([\s\S]*?)(?=\n## |\n### |$)/i);
+        if (mdSection) {
+            let section = mdSection[1];
+            section = section.replace(/```[\s\S]*?```/g, ''); // remove code blocks
+            section = section.replace(/!\[[^\]]*\]\([^\)]+\)/g, ''); // remove images
+            section = section.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1'); // replace links with text
+            return truncate(section);
+        }
+
+        // Remove YAML frontmatter and HTML comments, then take first paragraph-like line
         const withoutYaml = content.replace(/^---[\s\S]*?---\n/, '');
-        
-        // Remove HTML comments
         const withoutComments = withoutYaml.replace(/<!--[\s\S]*?-->/g, '');
-        
-        // Find first paragraph
         const lines = withoutComments.split('\n');
         for (const line of lines) {
             const trimmed = line.trim();
             if (trimmed && !trimmed.startsWith('#') && !trimmed.startsWith('```')) {
-                return trimmed.substring(0, 200) + (trimmed.length > 200 ? '...' : '');
+                return truncate(trimmed);
             }
         }
-        
         return 'No description available';
     }
     
