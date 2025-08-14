@@ -1,64 +1,228 @@
-name: New Customization
-description: Propose a new Customization.
-title: "[New Customization]: "
-labels: ["triage", "add"]
-projects: ["octo-org/1", "octo-org/44"]
+name: Catalog Customization Proposal
+description: Suggest a new Rule or Workflow for the Windsurf Customizations Catalog
+title: "[Catalog]: "
+labels: ["catalog-submission", "triage"]
 assignees:
-  - octocat
+  - ""
 body:
+  # =========================
+  # Intro / Guidance
+  # =========================
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+        Thanks for proposing a new customization!  
+        Please fill in all **Required** sections so we can review quickly.
+
+        **Tags reference:** See the labels guide here: https://github.com/Windsurf-Samples/cascade-customizations-catalog/blob/main/docs/labels.md
+
+        **Categories:**  
+        - **Category**: `rule` or `workflow`  
+        - **Rule subcategories**: `framework`, `general`, `language`, `security`, `style`  
+        - **Workflows**: no subcategories (use `N/A`)
+
+  # =========================
+  # Required Docs
+  # =========================
   - type: input
-    id: contact
+    id: title_of_customization
     attributes:
-      label: Contact Details
-      description: How can we get in touch with you if we need more info?
-      placeholder: ex. email@example.com
-    validations:
-      required: false
-  - type: textarea
-    id: what-happened
-    attributes:
-      label: What happened?
-      description: Also tell us, what did you expect to happen?
-      placeholder: Tell us what you see!
-      value: "A bug happened!"
+      label: Title of customization
+      placeholder: e.g., "Java Coding Guidelines"
     validations:
       required: true
-  - type: dropdown
-    id: version
+
+  - type: textarea
+    id: description
     attributes:
-      label: Version
-      description: What version of our software are you running?
+      label: Description of customization
+      description: What does this customization do and why is it valuable?
+      placeholder: One-to-three sentence summary of the purpose, scope, and benefits.
+    validations:
+      required: true
+
+  - type: textarea
+    id: applicable_tags
+    attributes:
+      label: Applicable tags
+      description: |
+        List the catalog tags/labels that apply (comma-separated).  
+        Use the reference above to choose valid tags.
+      placeholder: e.g., java, coding-standards, best-practices, language
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: Select whether this is a Rule or Workflow.
       options:
-        - 1.0.2 (Default)
-        - 1.0.3 (Edge)
+        - rule
+        - workflow
+    validations:
+      required: true
+
+  - type: dropdown
+    id: subcategory
+    attributes:
+      label: Subcategory (rules only)
+      description: If Category is "rule", select a subcategory. Otherwise select "N/A".
+      options:
+        - framework
+        - general
+        - language
+        - security
+        - style
+        - N/A
+      default: 5
+    validations:
+      required: true
+
+  - type: input
+    id: directory_prefix
+    attributes:
+      label: Proposed directory location (relative to repo root)
+      description: |
+        Where should this live under `.windsurf/rules` or `.windsurf/workflows`?
+        Example (rule): `.windsurf/rules/language/java-coding-guidelines.yml`  
+        Example (workflow): `.windsurf/workflows/auto-assign-reviewers.yml`
+      placeholder: e.g., .windsurf/rules/language/java-coding-guidelines.yml
+    validations:
+      required: true
+
+  # =========================
+  # Customization Itself
+  # =========================
+  - type: dropdown
+    id: has_example_link
+    attributes:
+      label: Do you have an example rule/workflow you can link to?
+      options:
+        - "Yes"
+        - "No"
+    validations:
+      required: true
+
+  - type: input
+    id: example_link
+    attributes:
+      label: Link to example in an open-source repo
+      description: Provide a public URL to the rule/workflow if available.
+      placeholder: e.g., https://github.com/owner/repo/path/to/file.yml
+    validations:
+      required: true
+    if:
+      field: has_example_link
+      equals: "Yes"
+
+  # --- Branch for "No" (collect full spec) ---
+  - type: dropdown
+    id: type_explicit
+    attributes:
+      label: Type
+      description: Select the customization type.
+      options:
+        - Rule
+        - Workflow
+    validations:
+      required: true
+    if:
+      field: has_example_link
+      equals: "No"
+
+  - type: dropdown
+    id: rule_has_conditional
+    attributes:
+      label: (Rule only) Conditional activation?
+      description: If this is a Rule, does it activate conditionally?
+      options:
+        - "No"
+        - "Yes"
+        - "N/A (Workflow)"
       default: 0
     validations:
       required: true
-  - type: dropdown
-    id: browsers
+    if:
+      field: has_example_link
+      equals: "No"
+
+  - type: input
+    id: conditional_description
     attributes:
-      label: What browsers are you seeing the problem on?
-      multiple: true
-      options:
-        - Firefox
-        - Chrome
-        - Safari
-        - Microsoft Edge
+      label: Conditional activation description / glob
+      description: Provide the condition/glob (e.g., "activates when editing *.java files").
+      placeholder: e.g., Files matching **/*.java or paths under /rules/engine/**
+    validations:
+      required: true
+    if:
+      field: rule_has_conditional
+      equals: "Yes"
+
   - type: textarea
-    id: logs
+    id: customization_content
     attributes:
-      label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
-      render: shell
+      label: Customization content (rule or workflow)
+      description: Paste the full YAML (or JSON) content of the rule/workflow here.
+      placeholder: |
+        name: Java Coding Guidelines
+        # ... full content ...
+      render: yaml
+    validations:
+      required: true
+    if:
+      field: has_example_link
+      equals: "No"
+
+  # =========================
+  # Optional Docs
+  # =========================
+  - type: textarea
+    id: usage_instructions
+    attributes:
+      label: Usage instructions (optional)
+      description: Installation/enablement steps. Include any prerequisites or config flags.
+      placeholder: |
+        1. Copy file to .windsurf/rules/language/java-coding-guidelines.yml
+        2. Commit and push. The rule activates on .java files...
+    validations:
+      required: false
+
+  - type: textarea
+    id: usage_examples
+    attributes:
+      label: Usage examples (optional)
+      description: Provide example snippets and/or paste image/GIF URLs. You can also drag-and-drop images after submitting.
+      placeholder: |
+        Example before/after code:
+        ```java
+        // before ...
+        // after ...
+        ```
+        Screenshot/GIF URLs:
+        - https://...
+    validations:
+      required: false
+
+  # =========================
+  # Submitter Contact
+  # =========================
+  - type: input
+    id: contact
+    attributes:
+      label: Contact (optional)
+      description: How can we reach you for follow-ups (email or GitHub handle)?
+      placeholder: @your-handle or you@example.com
+    validations:
+      required: false
+
+  # =========================
+  # Confirmation
+  # =========================
   - type: checkboxes
-    id: terms
+    id: confirm
     attributes:
-      label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com). 
+      label: Confirmation
       options:
-        - label: I agree to follow this project's Code of Conduct
+        - label: I confirm this submission follows the Code of Conduct and includes all required information.
           required: true
