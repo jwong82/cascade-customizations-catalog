@@ -214,17 +214,6 @@ body:
       value: |
         If you do NOT have an example to link, please fill out the details below.
 
-  - type: dropdown
-    id: type_for_no_example
-    attributes:
-      label: Type (no example)
-      description: Select the type if you did not provide an example link
-      options:
-        - Rule
-        - Workflow
-    validations:
-      required: false
-
   - type: input
     id: activation_mode
     attributes:
@@ -238,7 +227,7 @@ body:
     id: customization_content
     attributes:
       label: Customization content
-      description: Paste the full content of the Rule or Workflow (Markdown). Include YAML frontmatter if applicable.
+      description: Paste the full content of the Rule or Workflow if link not provided.
       placeholder: |
         ---
         description: ...
@@ -247,7 +236,7 @@ body:
         activation: ...
         ---
         # Title
-        Details...
+        Customization content...
     validations:
       required: false
 
