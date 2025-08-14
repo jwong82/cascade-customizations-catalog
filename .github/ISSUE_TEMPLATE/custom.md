@@ -1,10 +1,284 @@
----
-name: Custom issue template
-about: Describe this issue template's purpose here.
-title: ''
-labels: ''
-assignees: ''
+name: Customization Proposal
+description: Suggest a new Rule or Workflow for the Cascade Customizations Catalog
+title: "[Customization Proposal]: <short title>"
+labels:
+  - triage
+  - proposal
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for proposing a new Cascade customization! Please provide the required information below.
+        
+        Notes:
+        - The Category + (Rule) Subcategory determines where this will live in the repo.
+        - See the full label list here: https://github.com/Windsurf-Samples/cascade-customizations-catalog/blob/main/docs/labels.md
 
----
+  # Required Docs
+  - type: input
+    id: customization_title
+    attributes:
+      label: Title of customization
+      description: Short, clear title for your rule or workflow
+      placeholder: e.g., "React Commit Message Linting Rule"
+    validations:
+      required: true
 
+  - type: textarea
+    id: customization_description
+    attributes:
+      label: Description of customization
+      description: What does this customization do and why is it useful?
+      placeholder: Provide a concise overview of the customization
+    validations:
+      required: true
 
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: Select whether this is a Rule or a Workflow
+      options:
+        - Rule
+        - Workflow
+    validations:
+      required: true
+
+  - type: dropdown
+    id: rule_subcategory
+    attributes:
+      label: Rule Subcategory (only if Category = Rule)
+      description: For rules, choose the subcategory. Not required for workflows.
+      options:
+        - framework
+        - general
+        - language
+        - security
+        - style
+    validations:
+      required: false
+
+  - type: dropdown
+    id: labels
+    attributes:
+      label: Applicable tags (labels)
+      description: Choose all applicable labels. See the full list and guidance: https://github.com/Windsurf-Samples/cascade-customizations-catalog/blob/main/docs/labels.md
+      multiple: true
+      options:
+        # Languages
+        - javascript
+        - typescript
+        - python
+        - java
+        - csharp
+        - cpp
+        - rust
+        - go
+        - php
+        - ruby
+        - swift
+        - kotlin
+        - dart
+        # Frameworks & Libraries
+        - react
+        - vue
+        - angular
+        - svelte
+        - nextjs
+        - nuxtjs
+        - express
+        - fastapi
+        - django
+        - flask
+        - spring
+        - dotnet
+        - laravel
+        - rails
+        # Technologies & Tools
+        - docker
+        - kubernetes
+        - git
+        - github
+        - gitlab
+        - jenkins
+        - circleci
+        - github-actions
+        - aws
+        - azure
+        - gcp
+        - terraform
+        - ansible
+        - nginx
+        - apache
+        - redis
+        - mongodb
+        - postgresql
+        - mysql
+        - elasticsearch
+        - rabbitmq
+        - kafka
+        - graphql
+        - rest
+        - grpc
+        - webpack
+        - vite
+        - babel
+        - eslint
+        - prettier
+        - jest
+        - cypress
+        - playwright
+        - storybook
+        - figma
+        - postman
+        - swagger
+        - prometheus
+        - grafana
+        - sentry
+        - datadog
+        # Development Areas
+        - frontend
+        - backend
+        - fullstack
+        - mobile
+        - desktop
+        - web
+        - api
+        - database
+        - devops
+        - cloud
+        # Practices & Methodologies
+        - testing
+        - security
+        - performance
+        - accessibility
+        - documentation
+        - code-review
+        - refactoring
+        - debugging
+        - monitoring
+        - logging
+        # Project Types
+        - startup
+        - enterprise
+        - open-source
+        - prototype
+        - production
+        - legacy
+        # Workflow Types
+        - setup
+        - deployment
+        - ci-cd
+        - maintenance
+        - migration
+        - backup
+        # Rule Activation Types
+        - always-on
+        - model-decision
+        - glob-based
+        - manual
+        # Difficulty Levels
+        - beginner
+        - intermediate
+        - advanced
+        - expert
+        # Team Roles
+        - developer
+        - team-lead
+        - architect
+        - devops
+        - qa
+        - designer
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        Location mapping:
+        - Rules will live under `.windsurf/rules/<subcategory>/`
+        - Workflows will live under `.windsurf/workflows/`
+
+  # Example or Full Details
+  - type: input
+    id: example_link
+    attributes:
+      label: Example link (optional)
+      description: Link to an existing example rule/workflow in an open-source repo
+      placeholder: https://github.com/<owner>/<repo>/path/to/example
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        If you do NOT have an example to link, please fill out the details below.
+
+  - type: dropdown
+    id: type_for_no_example
+    attributes:
+      label: Type (no example)
+      description: Select the type if you did not provide an example link
+      options:
+        - Rule
+        - Workflow
+    validations:
+      required: false
+
+  - type: input
+    id: activation_mode
+    attributes:
+      label: Conditional activation (Rules only)
+      description: If Rule, specify activation mode and any description/glob. Examples: `model-decision`, `glob-based` with pattern(s) like `src/**/*.ts`
+      placeholder: e.g., model-decision (when editing .java files) OR glob-based: src/**/*.ts
+    validations:
+      required: false
+
+  - type: textarea
+    id: customization_content
+    attributes:
+      label: Customization content
+      description: Paste the full content of the Rule or Workflow (Markdown). Include YAML frontmatter if applicable.
+      placeholder: """
+        ---
+        description: ...
+        labels: ...
+        author: ...
+        activation: ...
+        ---
+        # Title
+        Details...
+        """
+    validations:
+      required: false
+
+  # Optional Docs
+  - type: textarea
+    id: usage_instructions
+    attributes:
+      label: Usage instructions (optional)
+      description: Any setup or usage steps users should follow
+      placeholder: Step-by-step instructions
+    validations:
+      required: false
+
+  - type: textarea
+    id: usage_examples
+    attributes:
+      label: Usage examples (optional)
+      description: Add links or drag-and-drop GIFs/images demonstrating the customization
+      placeholder: Links or descriptions of screenshots/GIFs
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Terms and checks
+      description: Please confirm the following
+      options:
+        - label: I confirm this contribution can be shared under the repository's license
+          required: true
+        - label: I agree to follow the project's Code of Conduct
+          required: true
