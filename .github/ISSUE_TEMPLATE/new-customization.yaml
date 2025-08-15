@@ -11,10 +11,6 @@ body:
       value: |
         Thank you for proposing a new Cascade customization! Please provide the required information below.
         
-        Notes:
-        - The Category + (Rule) Subcategory determines where this will live in the repo.
-        - See the full label list here: https://github.com/Windsurf-Samples/cascade-customizations-catalog/blob/main/docs/labels.md
-
   # Required Docs
   - type: input
     id: customization_title
