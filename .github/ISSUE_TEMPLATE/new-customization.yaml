@@ -58,7 +58,7 @@ body:
   - type: dropdown
     id: labels
     attributes:
-      label: Applicable Tags (labels)
+      label: Applicable Tags (Labels)
       description: "Choose any applicable labels. See the full list and guidance: https://github.com/Windsurf-Samples/cascade-customizations-catalog/blob/main/docs/labels.md"
       multiple: true
       options:
@@ -199,7 +199,7 @@ body:
   - type: input
     id: example_link
     attributes:
-      label: Example link (optional)
+      label: Example link (Optional)
       description: Link to an existing example rule/workflow in an open-source repo
       placeholder: https://github.com/<owner>/<repo>/path/to/example
     validations:
