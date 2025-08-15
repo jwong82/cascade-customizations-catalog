@@ -50,6 +50,8 @@
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+    /* Standard property for broader compatibility */
+    line-clamp: 3;
     overflow: hidden;
 }
 
@@ -145,8 +147,10 @@
 
 /* Modal layout adjustments */
 #modalScrollArea {
-    /* Make modal content area taller than Tailwind's max-h-96 */
-    max-height: 80vh;
+    /* Let the content area flex and handle its own scrolling within the modal */
+    max-height: none;
+    flex: 1 1 auto;
+    min-height: 0; /* critical so child can shrink within flex parent */
 }
 
 /* Modal content spacing + typography tweaks */
@@ -230,4 +234,12 @@
 /* Raw section: allow taller preview similar to code blocks */
 #modalRawPre {
     max-height: 28rem;
+}
+
+/* Modal card: constrain overall modal height to viewport minus overlay padding
+   The overlay uses p-4 (1rem top + bottom), so subtract 2rem. */
+#customizationModal .modal-card {
+    max-height: calc(100vh - 2rem);
+    display: flex;
+    flex-direction: column;
 }
