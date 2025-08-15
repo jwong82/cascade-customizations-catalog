@@ -123,18 +123,32 @@ export class ModalManager {
             // Remove HTML comments for display
             content = content.replace(/<!--[\s\S]*?-->/g, '');
             
-            // Convert markdown to HTML (prefer Marked if available for proper semantics)
+            // Determine if we're dealing with Jekyll-rendered HTML (GitHub Pages)
+            const isHtmlDoc = /\.html(\?|$)/i.test(customization.path);
+
+            // Use HTML as-is for Jekyll output; convert Markdown locally
             let htmlContent;
-            if (window.marked && typeof window.marked.parse === 'function') {
-                htmlContent = window.marked.parse(content);
+            if (isHtmlDoc) {
+                htmlContent = content;
             } else {
-                htmlContent = this.markdownToHtml(content);
+                // Convert markdown to HTML (prefer Marked if available for proper semantics)
+                if (window.marked && typeof window.marked.parse === 'function') {
+                    htmlContent = window.marked.parse(content);
+                } else {
+                    htmlContent = this.markdownToHtml(content);
+                }
             }
             contentContainer.innerHTML = htmlContent;
-            
-            // Apply syntax highlighting if Prism is available
-            if (window.Prism && typeof Prism.highlightAll === 'function') {
-                Prism.highlightAll();
+
+            if (isHtmlDoc) {
+                // Jekyll/rouge often emits <div class="highlight"><pre>...<span> tokens</span></pre></div>.
+                // Normalize to Prism structure for consistent styling and avoid literal span text.
+                this.normalizeRougeBlocksToPrism(contentContainer);
+            } else {
+                // Apply syntax highlighting for locally converted Markdown
+                if (window.Prism && typeof Prism.highlightAll === 'function') {
+                    Prism.highlightAll();
+                }
             }
         } catch (error) {
             console.error('Failed to load content:', error);
@@ -239,5 +253,39 @@ export class ModalManager {
             .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
             // Line breaks
             .replace(/\n/gim, '<br>');
+    }
+
+    // Normalize Rouge (Jekyll) highlighted code blocks to Prism-friendly markup
+    normalizeRougeBlocksToPrism(rootEl) {
+        try {
+            const blocks = rootEl.querySelectorAll('div.highlight, pre.highlight');
+            blocks.forEach(block => {
+                const codeEl = block.querySelector('code') || block;
+                if (!codeEl) return;
+
+                // Derive language from data-lang or class names
+                let lang = codeEl.getAttribute('data-lang') || '';
+                const classList = Array.from((codeEl.classList || []));
+                const langClass = classList.find(c => c.startsWith('language-') || c.startsWith('lang-'));
+                if (langClass && !lang) lang = langClass.replace(/^lang(uage)?-/, '');
+
+                const text = codeEl.textContent || '';
+                const pre = document.createElement('pre');
+                const newCode = document.createElement('code');
+                if (lang) newCode.className = `language-${lang}`;
+                newCode.textContent = text; // ensure HTML within code is not interpreted as markup
+                pre.appendChild(newCode);
+
+                // Replace the entire Rouge wrapper with the normalized block
+                block.replaceWith(pre);
+
+                if (window.Prism && typeof Prism.highlightElement === 'function') {
+                    Prism.highlightElement(newCode);
+                }
+            });
+        } catch (e) {
+            // Non-fatal; leave content as-is on any error
+            console.warn('normalizeRougeBlocksToPrism failed:', e);
+        }
     }
 }
