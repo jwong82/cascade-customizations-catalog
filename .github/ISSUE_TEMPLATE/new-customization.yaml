@@ -15,7 +15,7 @@ body:
   - type: input
     id: customization_title
     attributes:
-      label: Title of customization
+      label: Title of Customization
       description: Short, clear title for your rule or workflow
       placeholder: e.g., "Java Style Guidelines"
     validations:
@@ -24,7 +24,7 @@ body:
   - type: textarea
     id: customization_description
     attributes:
-      label: Description of customization
+      label: Description of Customization
       description: What does this customization do and why is it useful?
       placeholder: Provide a concise overview of the customization
     validations:
@@ -58,7 +58,7 @@ body:
   - type: dropdown
     id: labels
     attributes:
-      label: Applicable tags (labels)
+      label: Applicable Tags (labels)
       description: "Choose any applicable labels. See the full list and guidance: https://github.com/Windsurf-Samples/cascade-customizations-catalog/blob/main/docs/labels.md"
       multiple: true
       options:
@@ -213,7 +213,7 @@ body:
   - type: input
     id: activation_mode
     attributes:
-      label: Conditional activation (Rules only)
+      label: Conditional Activation (Rules only)
       description: "If Rule, specify activation mode and any description/glob. Examples: `model-decision`, `glob-based` with pattern(s) like `src/**/*.ts`"
       placeholder: 'e.g., model-decision (when editing .java files) OR glob-based: src/**/*.ts'
     validations:
@@ -222,7 +222,7 @@ body:
   - type: textarea
     id: customization_content
     attributes:
-      label: Customization content
+      label: Customization Content
       description: Paste the full content of the Rule or Workflow if link not provided.
       placeholder: |
         ---
@@ -240,7 +240,7 @@ body:
   - type: textarea
     id: usage_instructions
     attributes:
-      label: Usage instructions (optional)
+      label: Usage Instructions (Optional)
       description: Any setup or usage steps users should follow
       placeholder: Step-by-step instructions
     validations:
@@ -249,7 +249,7 @@ body:
   - type: textarea
     id: usage_examples
     attributes:
-      label: Usage examples (optional)
+      label: Usage Examples (Optional)
       description: Add demonstrations of how the customization can be used
       placeholder: Links or descriptions of screenshots/GIFs
     validations:
