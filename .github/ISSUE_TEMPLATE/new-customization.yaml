@@ -199,7 +199,7 @@ body:
   - type: input
     id: example_link
     attributes:
-      label: Example link (Optional)
+      label: Example Link
       description: Link to an existing example rule/workflow in an open-source repo
       placeholder: https://github.com/<owner>/<repo>/path/to/example
     validations:
