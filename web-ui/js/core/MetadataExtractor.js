@@ -1,4 +1,4 @@
-import { LabelPatterns } from '../config/LabelPatterns.js?v=final';
+import { LabelPatterns } from '../config/LabelPatterns.js?v=20250815-rawfix';
 
 /**
  * Handles metadata extraction from various content formats

@@ -137,10 +137,11 @@ export class DataLoader {
         const baseName = link.filename.replace(/\.md$/i, '');
         // Display path: .html on GitHub Pages, .md locally
         const filePath = `${this.basePath}/docs/${type}/${subdir}/${baseName}${this.fileExtension}`;
-        // Source path for download/copy: use raw.githubusercontent.com on GH Pages
+        // Source path for download/copy/raw viewer: point to .windsurf sources
+        // Use raw.githubusercontent.com on GH Pages, local path in dev
         const windsurfPath = this.isGitHubPages
-            ? this.getRawGitHubUrl(`docs/${type}/${subdir}/${baseName}.md`)
-            : `${this.basePath}/docs/${type}/${subdir}/${baseName}.md`;
+            ? this.getRawGitHubUrl(`.windsurf/${type}/${subdir}/${baseName}.md`)
+            : `${this.basePath}/.windsurf/${type}/${subdir}/${baseName}.md`;
         
         try {
             const response = await fetch(filePath);

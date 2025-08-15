@@ -1,5 +1,5 @@
-import { ColorUtils } from '../utils/ColorUtils.js?v=final';
-import { FileUtils } from '../utils/FileUtils.js?v=final';
+import { ColorUtils } from '../utils/ColorUtils.js?v=20250815-rawfix';
+import { FileUtils } from '../utils/FileUtils.js?v=20250815-rawfix';
 
 /**
  * Manages modal functionality for viewing customizations
@@ -155,7 +155,7 @@ export class ModalManager {
         if (!codeEl) return;
         
         try {
-            const response = await fetch(customization.windsurfPath + `?v=${Date.now()}`);
+            const response = await fetch(customization.windsurfPath + `?v=${Date.now()}`, { cache: 'no-store' });
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             
             const content = await response.text();

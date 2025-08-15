@@ -1,8 +1,8 @@
-import { DataLoader } from './DataLoader.js?v=20250812-ghfix';
-import { FilterManager } from '../ui/FilterManager.js?v=20250812-ghfix';
-import { ViewRenderer } from '../ui/ViewRenderer.js?v=20250812-ghfix';
-import { ModalManager } from '../ui/ModalManager.js?v=20250812-ghfix';
-import { SidebarManager } from '../ui/SidebarManager.js?v=20250812-ghfix';
+import { DataLoader } from './DataLoader.js?v=20250815-rawfix';
+import { FilterManager } from '../ui/FilterManager.js?v=20250815-rawfix';
+import { ViewRenderer } from '../ui/ViewRenderer.js?v=20250815-rawfix';
+import { ModalManager } from '../ui/ModalManager.js?v=20250815-rawfix';
+import { SidebarManager } from '../ui/SidebarManager.js?v=20250815-rawfix';
 
 /**
  * Main application class - orchestrates all components

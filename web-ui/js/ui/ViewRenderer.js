@@ -1,4 +1,4 @@
-import { ColorUtils } from '../utils/ColorUtils.js?v=final';
+import { ColorUtils } from '../utils/ColorUtils.js?v=20250815-rawfix';
 
 /**
  * Handles rendering of customizations in grid and list views
