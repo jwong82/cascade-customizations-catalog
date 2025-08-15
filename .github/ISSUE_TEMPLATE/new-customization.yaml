@@ -250,7 +250,7 @@ body:
     id: usage_examples
     attributes:
       label: Usage examples (optional)
-      description: Add links or drag-and-drop GIFs/images demonstrating the customization
+      description: Add demonstrations of how the customization can be used
       placeholder: Links or descriptions of screenshots/GIFs
     validations:
       required: false
